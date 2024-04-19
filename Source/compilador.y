@@ -1,6 +1,6 @@
 
 // Testar se funciona corretamente o empilhamento de par�metros
-// passados por valor ou por refer�ncia.
+// passados por valor ou por referência.
 
 
 %{
@@ -17,6 +17,8 @@ int num_vars;
 %token PROGRAM ABRE_PARENTESES FECHA_PARENTESES
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
+%token LABEL TYPE ARRAY PROCEDURE FUNCTION GOTO
+%token IF THEN ELSE WHILE DO OR DIV AND NOT
 
 %%
 

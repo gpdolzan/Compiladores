@@ -73,91 +73,91 @@ end { simbolo = simb_end;
 label { simbolo = simb_label;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("label");
-          return T_LABEL;
+          return LABEL;
  }
 
 type { simbolo = simb_type;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("type");
-          return T_TYPE;
+          return TYPE;
  }
 
 array { simbolo = simb_array;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("array");
-          return T_ARRAY;
+          return ARRAY;
  }
 
 procedure { simbolo = simb_procedure;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("procedure");
-          return T_PROCEDURE;
+          return PROCEDURE;
  }
 
 function { simbolo = simb_function;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("function");
-          return T_FUNCTION;
+          return FUNCTION;
  }
 
 goto { simbolo = simb_goto;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("goto");
-          return T_GOTO;
+          return GOTO;
  }
 
 if { simbolo = simb_if;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("if");
-          return T_IF;
+          return IF;
  }
 
 then { simbolo = simb_then;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("then");
-          return T_THEN;
+          return THEN;
  }
 
 else { simbolo = simb_else;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("else");
-          return T_ELSE;
+          return ELSE;
  }
 
 while { simbolo = simb_while;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("while");
-          return T_WHILE;
+          return WHILE;
  }
 
 do { simbolo = simb_do;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("do");
-          return T_DO;
+          return DO;
  }
 
 or { simbolo = simb_or;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("or");
-          return T_OR;
+          return OR;
  }
 
 div { simbolo = simb_div;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("div");
-          return T_DIV;
+          return DIV;
  }
 
 and { simbolo = simb_and;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("and");
-          return T_AND;
+          return AND;
  }
 
 not { simbolo = simb_not;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME("not");
-          return T_NOT;
+          return NOT;
  }
 
 := { simbolo = simb_atribuicao;
