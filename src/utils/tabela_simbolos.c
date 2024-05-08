@@ -1,7 +1,7 @@
 #include "tabela_simbolos.h"
 
-t_stack *iniciar_tabela() {
-  t_stack *nova_tabela = (t_stack *)malloc(sizeof(t_stack));
+tabela_simbolos *iniciar_tabela() {
+  tabela_simbolos *nova_tabela = (tabela_simbolos *)malloc(sizeof(tabela_simbolos));
   if (nova_tabela != NULL) {
     nova_tabela->top = NULL;
     nova_tabela->bottom = NULL;
@@ -25,25 +25,67 @@ t_node *criar_nodo(simbolo *simbolo, t_node *prev) {
   return new_node;
 }
 
-void push(t_stack *tabela, simbolo *simbolo) {
+void push(tabela_simbolos *tabela, simbolo *simbolo) {
   if (tabela != NULL) {
     t_node *novo_nodo = criar_nodo(simbolo, tabela->top);
 
     if (novo_nodo != NULL) {
-      tabela->top = novo_nodo;
-
-      if (tabela->bottom == NULL) {
-        tabela->bottom = novo_nodo;
+      if (tabela->top == NULL) { // Caso a tabela esteja inicialmente vazia
+        tabela->bottom = novo_nodo; // O primeiro elemento é tanto o topo quanto o fundo
       }
+      tabela->top = novo_nodo; // Atualiza o topo para o novo nodo
     }
   }
 }
 
-int is_stack_empty(t_stack *tabela) {
+void coloca_tipo_em_simbolos(tabela_simbolos *tabela, tipo_variavel tipo, int quantidade) {
+    if (tabela == NULL || tabela->top == NULL) {
+        printf("A tabela esta vazia ou não inicializada.\n");
+        return;
+    }
+
+    t_node *current = tabela->top;
+    int count = 0;
+
+    while (current != NULL && count < quantidade) {
+        current->simbolo->tipo_v = tipo;
+        current = current->prev;
+        count++;
+    }
+
+    if (count < quantidade) {
+        printf("Aviso: apenas %d símbolos foram modificados, pois a tabela contém menos símbolos que a quantidade especificada.\n", count);
+    }
+}
+
+int is_stack_empty(tabela_simbolos *tabela) {
   return (tabela == NULL || tabela->top == NULL);
 }
 
-simbolo *pop(t_stack *tabela) {
+simbolo *busca_simbolo(tabela_simbolos *tabela, char* simb)
+{
+  if (is_stack_empty(tabela)) {
+    return NULL;
+  }
+
+  int tam_simb = strlen(simb);
+
+  t_node *current = tabela->top;
+  while (current != NULL) {
+    int tam_id = strlen(current->simbolo->identificador);
+
+    if(tam_id == tam_simb)
+    {
+      if(strncmp(simb, current->simbolo->identificador, tam_simb) == 0)
+        return current->simbolo;
+    }
+
+    current = current->prev; // Mude para 'prev' para ir do topo ao fundo
+  }
+  return NULL;
+}
+
+simbolo *pop(tabela_simbolos *tabela) {
   if (is_stack_empty(tabela)) {
     return NULL;
   }
@@ -61,16 +103,40 @@ simbolo *pop(t_stack *tabela) {
   return simbolo;
 }
 
-// void print_stack(t_stack *tabela) {
-//   if (is_stack_empty(tabela)) {
-//     printf("Stack is empty.\n");
-//     return;
-//   }
-//   printf("Stack contains:\n");
-//   t_node *current = tabela->top;
-//   while (current != NULL) {
-//     printf("%d\n",
-//            *(int *)current->data); // Assuming the data is of type int
-//     current = current->next;
-//   }
-// }
+// Function to print a symbol
+void print_simbolo(simbolo *s) {
+    if (s != NULL) {
+        printf("Simbolo: %s, Tipo: %d, Nivel Lexico: %d, Deslocamento: %d\n",
+               s->identificador, s->tipo_v, s->nivel_lexico, s->deslocamento);
+    } else {
+        printf("Simbolo NULL\n");
+    }
+}
+
+void print_tabela(tabela_simbolos *tabela) {
+    if (is_stack_empty(tabela)) {
+        printf("┌─────────────────┐\n");
+        printf("│  Tabela Vazia!  │\n");
+        printf("└─────────────────┘\n");
+        return;
+    }
+
+    t_node *current = tabela->top;
+    printf("┌─────────────────────────────────────────────────────────────┐\n");
+    printf("│                          Tabela de Símbolos                 │\n");
+    printf("├─────────────┬──────────┬───────────────┬────────────────────┤\n");
+    printf("│   Símbolo   │   Tipo   │ Nível Léxico  │    Deslocamento    │\n");
+    printf("├─────────────┼──────────┼───────────────┼────────────────────┤\n");
+    while (current != NULL) {
+        printf("│ %-11s │ %-8s │ %-13d │ %-18d │\n",
+               current->simbolo->identificador,
+               current->simbolo->tipo_v == t_int ? "Int" : "Bool",
+               current->simbolo->nivel_lexico,
+               current->simbolo->deslocamento);
+        current = current->prev; // Mude para 'prev' para ir do topo ao fundo
+        if (current != NULL) {
+            printf("├─────────────┼──────────┼───────────────┼────────────────────┤\n");
+        }
+    }
+    printf("└─────────────┴──────────┴───────────────┴────────────────────┘\n");
+}

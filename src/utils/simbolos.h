@@ -23,7 +23,7 @@ typedef enum {
 } tipo_variavel;
 
 typedef struct {
-  char simbolo[TAM_SIMBOLO];
+  char identificador[TAM_SIMBOLO];
   tipo_variavel tipo_v;
   int nivel_lexico;
   int deslocamento;

@@ -4,6 +4,7 @@
 #include "simbolos.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct t_node {
   struct t_node *next;
@@ -12,16 +13,18 @@ typedef struct t_node {
   simbolo *simbolo;
 } t_node;
 
-typedef struct t_stack {
+typedef struct tabela_simbolos {
   t_node *top;
   t_node *bottom;
 } tabela_simbolos;
 
 tabela_simbolos *iniciar_tabela();
-// int is_stack_empty(t_stack *stk);
+int is_stack_empty(tabela_simbolos *tabela);
 void push(tabela_simbolos *tabela, simbolo *simbolo);
+void coloca_tipo_em_simbolos(tabela_simbolos *tabela, tipo_variavel tipo, int quantidade);
+simbolo *busca_simbolo(tabela_simbolos *tabela, char* simb);
 simbolo *pop(tabela_simbolos *tabela);
-
-// void print_stack(t_stack *tabela);
+void print_simbolo(simbolo *s);
+void print_tabela(tabela_simbolos *tabela);
 
 #endif
