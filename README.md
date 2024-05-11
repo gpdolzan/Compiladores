@@ -27,3 +27,25 @@ Instruções detalhadas sobre como compilar e executar o compilador podem ser en
 ## Agradecimentos
 
 Obrigado pai e mãe por me criarem para este momento único onde eu posso desenvolver um compilador irado.
+
+## USAGE
+
+1. Só para gerar código MEPA:
+> make
+
+2. Executar o programa
+> ./compilador teste1.pas
+
+3. Ver código MEPA
+> cat MEPA
+
+
+Para aqueles mais curiosos, verifiquem o arquivo lex.yy.c . Este
+arquivo é a implementação em "C" da autômato gerado pelo analisador
+léxico ao ler o arquivo "compilador.l". De forma análoga,
+"compilador.tab.c" é o autômato a pilha gerado pelo bison ao ler o
+arquivo "compilador.y".
+
+Na segunda parte da disciplina, será mostrado como gerar um autômato a
+pilha (tabela de ações e de desvios) para uma classe de gramáticas
+mais restritas do que esta, porém que segue o mesmo "esquema".

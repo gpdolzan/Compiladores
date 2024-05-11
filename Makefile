@@ -1,25 +1,47 @@
- # -------------------------------------------------------------------
- #            Arquivo: Makefile
- # -------------------------------------------------------------------
- #              Autor: Bruno Müller Junior
- #               Data: 08/2007
- #      Atualizado em: [09/08/2020, 19h:01m]
- #
- # -------------------------------------------------------------------
 
-$DEPURA=1
+# Compiler and flags
+CXX := g++ --std=c++14
 
-compilador: lex.yy.c compilador.tab.c compilador.o compilador.h
-	gcc lex.yy.c compilador.tab.c compilador.o -o compilador -ll -ly -lc
+# Directories
+SRCDIR := src
+BUILDDIR := build
+TARGET := compilador
 
-lex.yy.c: compilador.l compilador.h
-	flex compilador.l
+# Find all CPP files in src directory and its subdirectories
+SOURCES := $(shell find $(SRCDIR) -type f -name *.cpp)
 
-compilador.tab.c: compilador.y compilador.h
-	bison compilador.y -d -v
+# Generate object file names based on source file names
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
 
-compilador.o : compilador.h compiladorF.c
-	gcc -c compiladorF.c -o compilador.o
+# Build executable
+$(TARGET): $(OBJECTS) flex bison
+	$(CXX) $(OBJECTS) $(BUILDDIR)/flex.cpp $(BUILDDIR)/bison.cpp -o $@
 
-clean :
-	rm -f compilador.tab.* lex.yy.c compilador.o compilador compilador.output MEPA
+# Build object files
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(@D)
+	$(CXX) -c $< -o $@
+
+flex: $(SRCDIR)/lexer.l
+	@mkdir -p $(BUILDDIR)
+	flex $< 
+	mv flex.cpp $(BUILDDIR)/flex.cpp
+	mv flex.hpp $(BUILDDIR)/flex.hpp
+
+bison: $(SRCDIR)/grammar.y
+	@mkdir -p $(BUILDDIR)
+	bison $<
+	mv bison.cpp $(BUILDDIR)/bison.cpp
+	mv bison.hpp $(BUILDDIR)/bison.hpp
+
+# Phony target to clean the build directory
+.PHONY: clean
+clean:
+	rm -r $(BUILDDIR)
+	rm $(TARGET)
+	rm mepa.txt
+
+# Phony target to run the program
+.PHONY: run
+run: $(TARGET)
+	./$(TARGET) 

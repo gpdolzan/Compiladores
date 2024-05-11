@@ -4,15 +4,35 @@
 
 
 %{
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include "compilador.h"
+#include <iostream>
+#include <string>
+#include <cmath>
+#include "flex.hpp"
+#include "../includes/compilador.hpp"
 
+#define flags(STR) std::cerr << "\033[1;31m" << STR << "\033[0m\n"
+#define flag std::cerr << "\033[1;31mFLAG\033[0m\n"
 int num_vars;
+int lexic_level = 0;
 
 %}
+
+%require "3.7.4"
+%language "C++"
+%defines "bison.hpp"
+%output "bison.cpp"
+
+%define api.parser.class {Parser}
+%define api.namespace {bison}
+%define api.value.type variant
+%param {yyscan_t scanner}
+
+%code provides
+{
+    #define YY_DECL \
+        int yylex(bison::Parser::semantic_type *yylval, yyscan_t yyscanner)
+    YY_DECL;
+}
 
 %token PROGRAM VAR T_BEGIN T_END
 %token LABEL TYPE ARRAY PROCEDURE
@@ -27,19 +47,21 @@ int num_vars;
 %token MAIS MENOS MULTI NUMERO
 %token IDENT
 
+%precedence LOWER_THEN_ELSE
+%precedence ELSE
 %%
 
 // 1. programa -> PROGRAM IDENT '(' lista_idents ')' ';' bloco '.'
 programa:   
    {
       iniciaCompilador();
-      geraCodigo (NULL, "INPP");
+      geraCodigo("INPP");
    }
    PROGRAM IDENT
    ABRE_PARENTESES lista_idents FECHA_PARENTESES PONTO_E_VIRGULA
    bloco PONTO 
    {
-      geraCodigo (NULL, "PARA");
+      geraCodigo("PARA");
       desligaCompilador();
    }
 ;
@@ -63,19 +85,18 @@ var:
    VAR declara_vars
    |
 ;
-
+ 
 declara_vars: 
    declara_vars declara_var
    | declara_var
-;
+; 
 
 declara_var : { }
    lista_id_var DOIS_PONTOS
    tipo
    {
       // vou ter o tipo e todos os identificadores
-
-      geraCodigo(NULL, "AMEM", num_vars);
+      geraCodigo("AMEM", "", num_vars);
    }
    PONTO_E_VIRGULA
 ;
@@ -83,19 +104,20 @@ declara_var : { }
 tipo: 
    IDENT
    {
-      tipo_variavel tipo;
-      if (strcmp(token, "integer") == 0) {
-         tipo = t_int;
-      } else if (strcmp(token, "boolean") == 0) {
-         tipo = t_bool;
-      }
+      // tipo_variavel tipo;
+      // if (strcmp(token, "integer") == 0) {
+      //    tipo = t_int;
+      // } else if (strcmp(token, "boolean") == 0) {
+      //    tipo = t_bool;
+      // }
       
-      // ToDo
-      pilhaSimbolos *fim = tabelaSimbolo->prev;
-      for (int i = 0; i < num_vars; i++) {
-         fim->tipov = tipo;
-         fim = fim->prev;
-      }
+      // // ToDo
+      // pilhaSimbolos *fim = tabelaSimbolo->prev;
+      // for (int i = 0; i < num_vars; i++) {
+      //    fim->tipov = tipo;
+      //    fim = fim->prev;
+      // }
+      visualizaTabela();
    }
 ;
 
@@ -105,14 +127,14 @@ lista_id_var:
       num_vars++;
 
       //ToDo
-      insereSimbolo
+      // insereSimbolo();
    }
    | IDENT 
    { 
       num_vars++;
 
       //ToDo
-      insereSimbolo
+      // insereSimbolo();
    }
 ;
 
@@ -129,13 +151,13 @@ comando_composto:
 comandos:
 ;
 
-// 24. 
+/* // 24. 
 lista_de_expressoes:
    lista_de_expressoes VIRGULA expressao
-   | expressao
+   | expressao */
 ;
 
-// 25 & 26..
+/* // 25 & 26..
 expressao: 
    expressao_simples  // ToDo aplicarOperacao
    | expressao_simples MENOR_QUE expressao_simples { aplicarOperacao("CMME", BOOLEANO); }
@@ -170,37 +192,17 @@ fator:
    | TRUE {}
    | FALSE {}
    | ABRE_PARENTESES expressao FECHA_PARENTESES
-;
+; */
 
 // 30.
-variavel_func:
+/* variavel_func:
    IDENT
-;
+; */
 
 %%
 
-int main (int argc, char** argv) {
-   FILE* fp;
-   extern FILE* yyin;
-
-   if (argc<2 || argc>2) {
-         printf("usage compilador <arq>a %d\n", argc);
-         return(-1);
-      }
-
-   fp=fopen (argv[1], "r");
-   if (fp == NULL) {
-      printf("usage compilador <arq>b\n");
-      return(-1);
-   }
-
-
-/* -------------------------------------------------------------------
- *  Inicia a Tabela de Simbolos
- * ------------------------------------------------------------------- */
-
-   yyin=fp;
-   yyparse();
-
-   return 0;
+void bison::Parser::error(const std::string& msg) {
+    std::cerr << msg << " at line " << nl <<'\n';
+    std::cerr << "with token " << simbolo_flex << '\n';
+    exit(0);
 }
