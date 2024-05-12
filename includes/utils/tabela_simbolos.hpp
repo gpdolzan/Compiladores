@@ -11,22 +11,26 @@ public:
   Simbolo *simbolo;
 };
 
-class tabela_simbolos {
+class TabelaSimbolos {
 public:
+  TabelaSimbolos() : top(nullptr), bottom(nullptr){};
+
+  void push(Simbolo *simbolo);
+  Simbolo *pop();
+  Simbolo *busca_simbolo(const std::string &simb);
+
+  void coloca_tipo_em_simbolos(tipo_variavel tipo, int quantidade);
+
+  void print_tabela();
+
+protected:
+  int is_stack_empty();
+
+private:
   t_node *top;
   t_node *bottom;
 };
 
-tabela_simbolos *iniciar_tabela();
-int is_stack_empty(tabela_simbolos *tabela);
-
 void print_simbolo(Simbolo *s);
-void print_tabela(tabela_simbolos *tabela);
-
-void push(tabela_simbolos *tabela, Simbolo *simbolo);
-Simbolo *pop(tabela_simbolos *tabela);
-void coloca_tipo_em_simbolos(tabela_simbolos *tabela, tipo_variavel tipo,
-                             int quantidade);
-Simbolo *busca_simbolo(tabela_simbolos *tabela, char *simb);
 
 #endif

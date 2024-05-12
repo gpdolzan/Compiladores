@@ -8,6 +8,7 @@
 
 #define flags(STR) std::cerr << "\033[1;31m" << STR << "\033[0m\n"
 #define flag std::cerr << "\033[1;31mFLAG\033[0m\n"
+
 int num_vars;
 int lexic_level = 0;
 %}
@@ -53,8 +54,8 @@ int lexic_level = 0;
 %token MAIS MENOS MULTI NUMERO
 %token IDENT
 
-%precedence LOWER_THEN_ELSE
-%precedence ELSE
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
 %%
 
 // 1. programa -> PROGRAM IDENT '(' lista_idents ')' ';' bloco '.'
@@ -81,8 +82,8 @@ bloco:
          int var_count = stack_block_var_count.top();
          stack_block_var_count.pop();
          if (var_count > 0) {
-            geraCodigo("DMEM", "", var_count);
-            removeSimbolo(var_count);
+            geraCodigo("DMEM", "", std::to_string(var_count));
+            removeSimbolos(var_count);
             top_desloc -= var_count;
          }
       }
@@ -97,7 +98,7 @@ parte_declara_vars:
    } 
    VAR declara_vars 
    {
-      geraCodigo("AMEM", "", num_total_vars);
+      geraCodigo("AMEM", "", std::to_string(num_total_vars));
       stack_block_var_count.push(num_total_vars);
       visualizaTabela();
    }
@@ -185,7 +186,7 @@ atribuicao:
    expressao
    {
       if($1->tipo_v == $3)
-         geraCodigo("ARMZ", "", $1->deslocamento, $1->nivel_lexico);
+         geraCodigo("ARMZ", "", std::to_string($1->deslocamento), std::to_string($1->nivel_lexico));
       else
          error("Tipos incompatíveis na atribuição\n");
    }
@@ -201,43 +202,54 @@ variavel:
 
 /* Regra 22 - Comando Condicional */
 comando_condicional:
-    if_then cond_else 
-    { 
-        //em_if_finaliza (); 
-    }
+   if_then cond_else
 ;
 
 if_then:
-    IF expressao 
-    {
-        //em_if_apos_expr ();
-    }
-    THEN comando_sem_rotulo
-    {
-        //em_if_apos_then ();
-    }
+   IF expressao_booleana 
+   {
+      start_if();
+   }
+   THEN comando_sem_rotulo
 ;
 
 cond_else:
-    ELSE comando_sem_rotulo
-    |
-    %prec LOWER_THEN_ELSE
+   ELSE 
+   {
+      start_else();
+   }
+   comando_sem_rotulo
+   {
+      end_else();
+   }
+   | %prec LOWER_THAN_ELSE
+   { 
+      end_if();
+   }
 ;
 
 /* Regra 23 - Comando Repetitivo */
 comando_repetitivo:
-    WHILE
-    {
+   WHILE
+   {
+      start_while();
+   }
+   expressao_booleana DO 
+   {
+      do_while();
+   } 
+   comando_sem_rotulo
+   {
+      end_while();
+   }
+;
 
-    }
-    expressao
-    {
-
-    }
-    DO comando_sem_rotulo
-    {
-        // Ação para laço de repetição no MEPA
-    }
+expressao_booleana:
+   expressao
+   {
+      if($1 != t_bool)
+         error("Expressão booleana inválida\n");
+   }
 ;
 
 // 24. 
@@ -313,20 +325,23 @@ termo: //ToDo aplicarOperacao
 fator:
    NUMERO 
    {
-      geraCodigo("CRCT", "", std::stoi(simbolo_flex));
+      geraCodigo("CRCT", "", simbolo_flex);
       $$ = t_int;
    }
    | TRUE 
    {
-      geraCodigo("CRCT", "", 1);
+      geraCodigo("CRCT", "", "1");
       $$ = t_bool;
    }
    | FALSE 
    {
-      geraCodigo("CRCT", "", 0);
+      geraCodigo("CRCT", "", "0");
       $$ = t_bool;
    }
    | ABRE_PARENTESES expressao FECHA_PARENTESES
+   {
+      $$ = $2;
+   }
    | variavel_func
 ;
 
@@ -342,7 +357,7 @@ variavel_func:
       
       $$ = simbolo->tipo_v;
 
-      geraCodigo("CRVL", "", simbolo->deslocamento, simbolo->nivel_lexico);
+      geraCodigo("CRVL", "", std::to_string(simbolo->deslocamento), std::to_string(simbolo->nivel_lexico));
    }
 ;
 

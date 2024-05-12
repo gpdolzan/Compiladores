@@ -25,6 +25,8 @@ numero [0-9]+
 
 comentario "(*".*"*)"
 
+comentario2 "//".*
+
 %%
 
 {pulo_linha} {nl++;}
@@ -32,6 +34,8 @@ comentario "(*".*"*)"
 {descarte}
 
 {comentario}
+
+{comentario2}
 
 program {
   simbolo_flex = yytext;        

@@ -1,11 +1,13 @@
-program exemplo75 (input, output);
-var m, n :  integer;
-    u, p:  boolean;
-begin
-    m := 5;
-    n := 3;
-    u := m > n;
-    p := m < n;
-    m := m + 1;
-    n := n - 1;
-end.
+program cmdIf (input, output);
+var i, j: integer;       
+begin     
+   (* j := i div 2 * 2 = i; *)
+   i:=0;
+   while (i < j) do        
+   begin                   
+      if (i div 2 * 2 = i)  
+        then i := i+1  
+        else i := i+1; 
+      i := i+1                    
+   end;                    
+end. 
