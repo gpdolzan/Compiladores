@@ -11,7 +11,6 @@ using namespace bison;
 #define PADD std::left << std::setw(16) << std::setfill(' ')
 #define IMPRIME(STR) std::cerr << PADD << STR << "\t# " << PADD << simbolo_flex << nl << '\n' ;
 
-int nl = 1;
 %}
 
 %option reentrant interactive noyywrap noyylineno nodefault outfile="flex.cpp" header="flex.hpp"

@@ -56,6 +56,20 @@ typedef enum { t_int, t_bool, t_undefined } tipo_variavel;
 
 class Simbolo {
 public:
+  Simbolo() = default;
+  Simbolo(std::string identificador, tipo_variavel tipo_v, int nivel_lexico)
+      : identificador{identificador}, tipo_v{tipo_v},
+        nivel_lexico{nivel_lexico} {}
+  Simbolo(std::string identificador, int nivel_lexico)
+      : Simbolo(identificador, t_undefined, nivel_lexico) {}
+  Simbolo(std::string identificador, int nivel_lexico, int deslocamento)
+      : Simbolo(identificador, t_undefined, nivel_lexico, deslocamento) {}
+  Simbolo(std::string identificador, tipo_variavel tipo_v, int nivel_lexico,
+          int deslocamento)
+      : Simbolo{identificador, tipo_v, nivel_lexico} {
+    this->deslocamento = deslocamento;
+  }
+
   std::string identificador;
   tipo_variavel tipo_v;
   int nivel_lexico;

@@ -22,13 +22,13 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(@D)
 	$(CXX) -c $< -o $@
 
-flex: $(SRCDIR)/lexer.l
+flex: $(SRCDIR)/flex.l
 	@mkdir -p $(BUILDDIR)
 	flex $< 
 	mv flex.cpp $(BUILDDIR)/flex.cpp
 	mv flex.hpp $(BUILDDIR)/flex.hpp
 
-bison: $(SRCDIR)/grammar.y
+bison: $(SRCDIR)/bison.y
 	@mkdir -p $(BUILDDIR)
 	bison $<
 	mv bison.cpp $(BUILDDIR)/bison.cpp
@@ -44,4 +44,4 @@ clean:
 # Phony target to run the program
 .PHONY: run
 run: $(TARGET)
-	./$(TARGET) 
+	./$(TARGET) < tests/teste1.pas

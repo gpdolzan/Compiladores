@@ -116,21 +116,21 @@ void print_tabela(tabela_simbolos *tabela) {
     }
 
     t_node *current = tabela->top;
-    printf("┌─────────────────────────────────────────────────────────────┐\n");
-    printf("│                          Tabela de Símbolos                 │\n");
-    printf("├─────────────┬──────────┬───────────────┬────────────────────┤\n");
-    printf("│   Símbolo   │   Tipo   │ Nível Léxico  │    Deslocamento    │\n");
-    printf("├─────────────┼──────────┼───────────────┼────────────────────┤\n");
+    printf("┌──────────────────────────────────────────────────────────────┐\n");
+    printf("│                          Tabela de Símbolos                  │\n");
+    printf("├─────────────┬───────────┬───────────────┬────────────────────┤\n");
+    printf("│   Símbolo   │   Tipo    │ Nível Léxico  │    Deslocamento    │\n");
+    printf("├─────────────┼───────────┼───────────────┼────────────────────┤\n");
     while (current != nullptr) {
-        printf("│ %-11s │ %-8s │ %-13d │ %-18d │\n",
+        printf("│ %-11s │ %-9s │ %-13d │ %-18d │\n",
                current->simbolo->identificador.c_str(),
-               current->simbolo->tipo_v == t_int ? "Int" : "Bool",
+               current->simbolo->tipo_v == t_undefined ? "Undefined" : (current->simbolo->tipo_v == t_int ? "Inteiro" : "Booleano"),
                current->simbolo->nivel_lexico,
                current->simbolo->deslocamento);
         current = current->prev; // Mude para 'prev' para ir do topo ao fundo
         if (current != nullptr) {
-            printf("├─────────────┼──────────┼───────────────┼────────────────────┤\n");
+            printf("├─────────────┼───────────┼───────────────┼────────────────────┤\n");
         }
     }
-    printf("└─────────────┴──────────┴───────────────┴────────────────────┘\n");
+    printf("└─────────────┴───────────┴───────────────┴────────────────────┘\n");
 }
