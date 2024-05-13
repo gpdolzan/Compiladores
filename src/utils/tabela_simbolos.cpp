@@ -51,6 +51,28 @@ void TabelaSimbolos::coloca_tipo_em_simbolos(tipo_variavel tipo,
   }
 }
 
+void TabelaSimbolos::coloca_tipo_em_simbolos(tipo_parametro_variavel tipo, int quantidade){
+    if (this->is_stack_empty()) {
+    std::cerr << "A tabela esta vazia\n";
+    return;
+  }
+
+  t_node *current = this->top;
+  int count = 0;
+
+  while (current != nullptr && count < quantidade) {
+    current->simbolo->tipo_param_var = tipo;
+    current = current->prev;
+    count++;
+  }
+
+  if (count < quantidade) {
+    printf("Aviso: apenas %d símbolos foram modificados, pois a tabela contém "
+           "menos símbolos que a quantidade especificada.\n",
+           count);
+  }
+}
+
 int TabelaSimbolos::is_stack_empty() { return this->top == nullptr; }
 
 Simbolo *TabelaSimbolos::busca_simbolo(const std::string &simb) {

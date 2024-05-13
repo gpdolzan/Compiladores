@@ -32,7 +32,8 @@ void desligaCompilador();
 void insereSimbolo(Simbolo *simb);
 Simbolo *buscaSimbolo(const std::string &simb);
 void removeSimbolos(int quant);
-void colocaTipoEmSimbolos(const std::string &tipo, int quantidade);
+void colocaTipoEmSimbolos(tipo_variavel tipo, int quantidade);
+void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade);
 
 void insereRotulo(Rotulo *rotulo);
 void removeRotulos(int quantidade);

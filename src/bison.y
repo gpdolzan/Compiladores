@@ -11,6 +11,7 @@
 
 int num_vars;
 int lexic_level = 0;
+std::list<Param> *params;
 %}
 
 %require "3.7.4"
@@ -40,6 +41,9 @@ int lexic_level = 0;
 %type <tipo_variavel> expressao
 %type <tipo_variavel> termo
 %type <Simbolo*> variavel
+%type <std::string> ident
+%type <tipo_parametro> tipo_parametro
+%type <tipo_variavel> tipo
 
 %token PROGRAM VAR T_BEGIN T_END
 %token LABEL TYPE ARRAY PROCEDURE
@@ -76,6 +80,7 @@ programa:
 // 2. bloco -> parte_declara_vars comando_composto
 bloco:
    parte_declara_vars
+   parte_declara_subrotinas
    comando_composto
    {
       if (!stack_block_var_count.empty()) {
@@ -113,37 +118,148 @@ declara_vars:
 
 declara_var:
    lista_id_var DOIS_PONTOS tipo PONTO_E_VIRGULA
-;
-
-tipo:
-   IDENT
    {
-      colocaTipoEmSimbolos(simbolo_flex,  num_same_type_vars);
+      colocaTipoEmSimbolos($3, num_same_type_vars);
       num_same_type_vars = 0;
    }
 ;
 
 lista_id_var: 
-   lista_id_var VIRGULA IDENT
+   lista_id_var VIRGULA ident
    { 
-      insereSimbolo(new Simbolo(simbolo_flex, lexic_level, top_desloc));
+      insereSimbolo(new Simbolo($3, lexic_level, top_desloc));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
    }
-   | IDENT 
+   | ident 
    { 
-      insereSimbolo(new Simbolo(simbolo_flex, lexic_level, top_desloc));
+      insereSimbolo(new Simbolo($1, lexic_level, top_desloc));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
    }
 ;
 
+ident: 
+   IDENT
+   {
+      $$ = simbolo_flex;
+   }
+;
+
 // 10. lista_idents -> lista_idents ',' IDENT | IDENT
 lista_idents: 
-   lista_idents VIRGULA IDENT
-   | IDENT
+   lista_idents VIRGULA ident
+   {
+      insereSimbolo(new Simbolo($3, lexic_level, top_desloc));
+      top_desloc++;
+      num_total_vars++;
+      num_same_type_vars++;
+   }
+   | ident
+   {
+      insereSimbolo(new Simbolo($1, lexic_level, top_desloc));
+      top_desloc++;
+      num_total_vars++;
+      num_same_type_vars++;
+   }
+;
+
+/* Regra 11 - Parte de Declarações de Sub-Rotinas */
+parte_declara_subrotinas:
+    parte_declara_subrotinas declaracao_procedimento PONTO_E_VIRGULA 
+    | parte_declara_subrotinas declaracao_funcao PONTO_E_VIRGULA 
+    | %empty
+;
+
+/* Regra 12 - Declaração de Procedimento */
+declaracao_procedimento:
+   declaracao_procedimento_two
+   bloco
+   {
+      removeSimbolos(1);
+      lexic_level--;
+   }
+;
+
+declaracao_procedimento_two:
+   PROCEDURE ident 
+   {
+      params = new std::list<Param>();
+   }
+   ABRE_PARENTESES parametros_formais FECHA_PARENTESES PONTO_E_VIRGULA
+   {
+      lexic_level++;
+      Simbolo *proce = new Simbolo($2, lexic_level, params, new Rotulo());
+
+      insereSimbolo(proce);
+   }
+;
+
+/* Regra 13 - Declaração de Função */
+declaracao_funcao:
+    FUNCTION IDENT 
+    parametros_formais 
+    {
+      num_vars = 0;
+    }
+    DOIS_PONTOS IDENT PONTO_E_VIRGULA
+    bloco
+    {
+        // Configura ambiente de função no MEPA
+    }
+;
+
+/* Regra 14 - Parâmetros Formais */
+parametros_formais:
+   parametros_formais PONTO_E_VIRGULA secao_parametros_formais_wrap
+   | secao_parametros_formais_wrap
+;
+
+tipo:
+   IDENT
+   {
+      if (simbolo_flex == "boolean")
+         $$ = t_bool;
+      else if (simbolo_flex == "integer")
+         $$ = t_int;
+      else {
+         $$ = t_undefined;
+         error("Tipo inválido\n");
+      }
+   }
+;
+
+secao_parametros_formais_wrap: 
+   {
+      num_same_type_vars = 0;
+   }
+   secao_parametros_formais
+;
+
+/* Regra 15 - Secao Parâmetros Formais */
+secao_parametros_formais:
+   tipo_parametro lista_idents DOIS_PONTOS tipo
+   {
+      for(int i = 0; i < num_same_type_vars; i++) {
+         params->push_back(Param($4, $1));
+      }
+
+      colocaTipoEmSimbolos($4, num_same_type_vars);
+      num_same_type_vars = 0;
+   }
+;
+
+tipo_parametro:
+   VAR
+   {
+      $$ = t_pointer;
+   }
+   | %empty
+   {
+      $$ = t_copy;
+   }
 ;
 
 /* Regra 16 - Comando Composto */
@@ -222,7 +338,7 @@ cond_else:
    {
       end_else();
    }
-   | %prec LOWER_THAN_ELSE
+   | %prec LOWER_THAN_ELSE %empty
    { 
       end_if();
    }

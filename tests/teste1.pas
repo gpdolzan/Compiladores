@@ -1,13 +1,14 @@
-program cmdIf (input, output);
-var i, j: integer;       
-begin     
-   (* j := i div 2 * 2 = i; *)
-   i:=0;
-   while (i < j) do        
-   begin                   
-      if (i div 2 * 2 = i)  
-        then i := i+1  
-        else i := i+1; 
-      i := i+1                    
-   end;                    
-end. 
+program proc2 (input, output);
+var x, y: integer;
+   procedure p(t:integer);
+   var z:integer;
+   begin
+      if (t>1)
+      then y:=2
+      else y:=1;
+      z:= y;
+      y:=z*t;
+   end;
+begin
+   x := x + y;
+end.

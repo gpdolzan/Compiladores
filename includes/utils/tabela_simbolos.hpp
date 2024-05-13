@@ -20,6 +20,7 @@ public:
   Simbolo *busca_simbolo(const std::string &simb);
 
   void coloca_tipo_em_simbolos(tipo_variavel tipo, int quantidade);
+  void coloca_tipo_em_simbolos(tipo_parametro_variavel tipo, int quantidade);
 
   void print_tabela();
 

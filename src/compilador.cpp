@@ -83,17 +83,12 @@ void removeSimbolos(int quant) {
   }
 }
 
-void colocaTipoEmSimbolos(const std::string &tipo, int quantidade) {
-  tipo_variavel tipo_v;
+void colocaTipoEmSimbolos(tipo_variavel tipo, int quantidade) {
+  tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
+}
 
-  if (tipo == "boolean")
-    tipo_v = t_bool;
-  else if (tipo == "integer")
-    tipo_v = t_int;
-  else
-    tipo_v = t_undefined;
-
-  tabela_simb->coloca_tipo_em_simbolos(tipo_v, quantidade);
+void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade){
+  tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
 }
 
 void insereRotulo(Rotulo *rotulo) { tabela_rotulos->push(rotulo); }

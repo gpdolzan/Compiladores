@@ -1,7 +1,10 @@
 #ifndef __SIMBOLOS_H__
 #define __SIMBOLOS_H__
 
+#include <list>
 #include <string>
+#include "tabela_rotulos.hpp"
+
 #define TAM_SIMBOLO 48
 
 typedef enum {
@@ -53,27 +56,49 @@ typedef enum {
 } flex_simbolos;
 
 typedef enum { t_int, t_bool, t_undefined } tipo_variavel;
+typedef enum { variavel_simples, parametros_formais } tipo_parametro_variavel;
+typedef enum { var, process, function } tipo_simbolo;
+typedef enum { t_copy, t_pointer } tipo_parametro;
+
+class Param {
+public:
+  Param(tipo_variavel tipo_v, tipo_parametro tipo_param)
+      : tipo_v{tipo_v}, tipo_param{tipo_param} {}
+
+  tipo_variavel tipo_v;
+  tipo_parametro tipo_param;
+};
+
 
 class Simbolo {
 public:
-  Simbolo() = default;
-  Simbolo(std::string identificador, tipo_variavel tipo_v, int nivel_lexico)
-      : identificador{identificador}, tipo_v{tipo_v},
-        nivel_lexico{nivel_lexico} {}
-  Simbolo(std::string identificador, int nivel_lexico)
-      : Simbolo(identificador, t_undefined, nivel_lexico) {}
-  Simbolo(std::string identificador, int nivel_lexico, int deslocamento)
-      : Simbolo(identificador, t_undefined, nivel_lexico, deslocamento) {}
-  Simbolo(std::string identificador, tipo_variavel tipo_v, int nivel_lexico,
-          int deslocamento)
-      : Simbolo{identificador, tipo_v, nivel_lexico} {
-    this->deslocamento = deslocamento;
+  Simbolo(const std::string &identificador, int nivel_lexico, int deslocamento)
+      : identificador{identificador}, tipo_simbo{var},
+        nivel_lexico{nivel_lexico}, deslocamento{deslocamento} {}
+
+  Simbolo(const std::string &identificador, int nivel_lexico,
+          std::list<Param> *parametros, Rotulo *rotulo)
+      : identificador{identificador}, tipo_simbo{process},
+        nivel_lexico{nivel_lexico}, parametros{parametros}, rotulo{rotulo} {}
+
+  ~Simbolo() {
+    if (parametros != nullptr)
+      delete parametros;
+      
+    if (rotulo != nullptr)
+      delete rotulo;
   }
 
   std::string identificador;
   tipo_variavel tipo_v;
+  tipo_parametro_variavel tipo_param_var;
+
   int nivel_lexico;
   int deslocamento;
+
+  std::list<Param> *parametros = nullptr;
+  tipo_simbolo tipo_simbo;
+  Rotulo *rotulo = nullptr;
 };
 
 #endif
