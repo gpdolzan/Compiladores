@@ -120,6 +120,28 @@ void print_simbolo(Simbolo *s) {
   }
 }
 
+void TabelaSimbolos::print_var_simbolo(Simbolo *simbolo) {
+  printf("│ %-11s │ %-13s │ %-13d │ %-18d │ %-13s │ %-13s │ %-14s │\n",
+         simbolo->identificador.c_str(),
+         "Variável",
+         simbolo->nivel_lexico,
+         simbolo->deslocamento,
+         "N/A",  // Tipo Param Var não aplicável
+         "N/A",  // Tipo Parametro não aplicável
+         "N/A"); // Rótulo não aplicável
+}
+
+void TabelaSimbolos::print_process_simbolo(Simbolo *simbolo) {
+  printf("│ %-11s │ %-12s │ %-13d │ %-18s │ %-13s │ %-13s │ %-14s │\n",
+         simbolo->identificador.c_str(),
+         "Procedimento",
+         simbolo->nivel_lexico,
+         "N/A",  // Deslocamento não aplicável
+         "N/A",  // Tipo Param Var não aplicável
+         "N/A",  // Tipo Parametro não aplicável
+         simbolo->rotulo != nullptr ? simbolo->rotulo->identificador.c_str() : "N/A");
+}
+
 void TabelaSimbolos::print_tabela() {
   if (this->is_stack_empty()) {
     printf("┌─────────────────┐\n");
@@ -129,23 +151,24 @@ void TabelaSimbolos::print_tabela() {
   }
 
   t_node *current = this->top;
-  printf("┌──────────────────────────────────────────────────────────────┐\n");
-  printf("│                          Tabela de Símbolos                  │\n");
-  printf("├─────────────┬───────────┬───────────────┬────────────────────┤\n");
-  printf("│   Símbolo   │   Tipo    │ Nível Léxico  │    Deslocamento    │\n");
-  printf("├─────────────┼───────────┼───────────────┼────────────────────┤\n");
+  printf("┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n");
+  printf("│                                             Tabela de Símbolos                                                   │\n");
+  printf("├─────────────┬──────────────┬───────────────┬────────────────────┬───────────────┬───────────────┬────────────────┤\n");
+  printf("│   Símbolo   │   Tipo       │ Nível Léxico  │   Deslocamento     │ Tipo Param Var│ Tipo Parametro│     Rótulo     │\n");
+  printf("├─────────────┼──────────────┼───────────────┼────────────────────┼───────────────┼───────────────┼────────────────┤\n");
+
   while (current != nullptr) {
-    printf("│ %-11s │ %-9s │ %-13d │ %-18d │\n",
-           current->simbolo->identificador.c_str(),
-           current->simbolo->tipo_v == t_undefined
-               ? "Undefined"
-               : (current->simbolo->tipo_v == t_int ? "Inteiro" : "Booleano"),
-           current->simbolo->nivel_lexico, current->simbolo->deslocamento);
+    if (current->simbolo->tipo_simbo == var) {
+      print_var_simbolo(current->simbolo);
+    } else {
+      print_process_simbolo(current->simbolo);
+    }
+
     current = current->prev; // Mude para 'prev' para ir do topo ao fundo
     if (current != nullptr) {
-      printf(
-          "├─────────────┼───────────┼───────────────┼────────────────────┤\n");
+      printf("├─────────────┼──────────────┼───────────────┼────────────────────┼───────────────┼───────────────┼────────────────┤\n");
     }
   }
-  printf("└─────────────┴───────────┴───────────────┴────────────────────┘\n");
+
+  printf("└─────────────┴──────────────┴───────────────┴────────────────────┴───────────────┴───────────────┴────────────────┘\n");
 }

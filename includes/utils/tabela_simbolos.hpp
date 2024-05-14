@@ -22,6 +22,8 @@ public:
   void coloca_tipo_em_simbolos(tipo_variavel tipo, int quantidade);
   void coloca_tipo_em_simbolos(tipo_parametro_variavel tipo, int quantidade);
 
+  void print_var_simbolo(Simbolo *simbolo);
+  void print_process_simbolo(Simbolo *simbolo);
   void print_tabela();
 
 protected:
