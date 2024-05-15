@@ -171,4 +171,33 @@ void TabelaSimbolos::print_tabela() {
   }
 
   printf("└─────────────┴──────────────┴───────────────┴────────────────────┴───────────────┴───────────────┴────────────────┘\n");
+
+  // Agora imprime os parâmetros dos símbolos
+  current = this->top;
+  while (current != nullptr) {
+    if (current->simbolo->parametros != nullptr && !current->simbolo->parametros->empty()) {
+      print_parametros(current->simbolo);
+    }
+    current = current->prev;
+  }
+
+}
+
+void TabelaSimbolos::print_parametros(Simbolo *simbolo) {
+  printf("┌───────────────────────────────────────────┐\n");
+  printf("│         Parâmetros do Símbolo: %-11s│\n", simbolo->identificador.c_str());
+  printf("├────────────┬──────────────┬───────────────┤\n");
+  printf("│ Índice     │ Tipo Var     │ Tipo Param    │\n");
+  printf("├────────────┼──────────────┼───────────────┤\n");
+
+  int index = 1;
+  for (const auto& param : *simbolo->parametros) {
+    printf("│ %-10d │ %-12s │ %-14s │\n",
+           index,
+           param.tipo_v == t_undefined ? "Undefined" : (param.tipo_v == t_int ? "Inteiro" : "Booleano"),
+           param.tipo_param == t_copy ? "Cópia" : "Ponteiro");
+    index++;
+  }
+
+  printf("└────────────┴──────────────┴───────────────┘\n");
 }

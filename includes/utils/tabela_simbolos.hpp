@@ -25,6 +25,7 @@ public:
   void print_var_simbolo(Simbolo *simbolo);
   void print_process_simbolo(Simbolo *simbolo);
   void print_tabela();
+  void print_parametros(Simbolo *simbolo);
 
 protected:
   int is_stack_empty();
