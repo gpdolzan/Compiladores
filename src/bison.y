@@ -351,7 +351,34 @@ comando_sem_rotulo:
    | comando_composto
    | comando_repetitivo
    | comando_condicional
+   | WRITE ABRE_PARENTESES lista_write FECHA_PARENTESES
+   | READ ABRE_PARENTESES lista_read FECHA_PARENTESES
 ;
+
+lista_write:
+   lista_write VIRGULA expressao
+   {
+      geraCodigo("IMPR");
+   }
+   | expressao
+   {
+      geraCodigo("IMPR");
+   }
+;
+
+lista_read:
+   lista_read VIRGULA variavel
+   {
+      geraCodigo("LEIT");
+      geraCodigo("ARMZ", "", std::to_string($3->nivel_lexico),  std::to_string($3->deslocamento));
+   }
+   | variavel
+   {
+      geraCodigo("LEIT");
+      geraCodigo("ARMZ", "", std::to_string($1->nivel_lexico),  std::to_string($1->deslocamento));
+   }
+;
+
 
 /* Regra 19 - Atribuicao */
 atribuicao:
