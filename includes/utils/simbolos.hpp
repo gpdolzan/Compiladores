@@ -1,9 +1,9 @@
 #ifndef __SIMBOLOS_H__
 #define __SIMBOLOS_H__
 
+#include "tabela_rotulos.hpp"
 #include <list>
 #include <string>
-#include "tabela_rotulos.hpp"
 
 #define TAM_SIMBOLO 48
 
@@ -62,6 +62,7 @@ typedef enum { t_copy, t_pointer } tipo_parametro;
 
 class Param {
 public:
+  Param() = default;
   Param(tipo_variavel tipo_v, tipo_parametro tipo_param)
       : tipo_v{tipo_v}, tipo_param{tipo_param} {}
 
@@ -69,12 +70,13 @@ public:
   tipo_parametro tipo_param;
 };
 
-
 class Simbolo {
 public:
-  Simbolo(const std::string &identificador, int nivel_lexico, int deslocamento)
+  Simbolo(const std::string &identificador, int nivel_lexico, int deslocamento,
+          tipo_parametro_variavel tipo_param_var)
       : identificador{identificador}, tipo_simbo{var},
-        nivel_lexico{nivel_lexico}, deslocamento{deslocamento} {}
+        tipo_param_var{tipo_param_var}, nivel_lexico{nivel_lexico},
+        deslocamento{deslocamento} {}
 
   Simbolo(const std::string &identificador, int nivel_lexico,
           std::list<Param> *parametros, Rotulo *rotulo)
@@ -84,14 +86,17 @@ public:
   ~Simbolo() {
     if (parametros != nullptr)
       delete parametros;
-      
-    if (rotulo != nullptr)
-      delete rotulo;
+
+    // if (rotulo != nullptr)
+    //   delete rotulo;
   }
+
+  int is_proc();
 
   std::string identificador;
   tipo_variavel tipo_v;
   tipo_parametro_variavel tipo_param_var;
+  tipo_parametro tipo_param;
 
   int nivel_lexico;
   int deslocamento;

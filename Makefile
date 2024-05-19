@@ -45,3 +45,8 @@ clean:
 .PHONY: run
 run: $(TARGET)
 	./$(TARGET) < tests/teste1.pas
+
+# Phony target to run the program
+.PHONY: valgrind
+valgrind: $(TARGET)
+	valgrind ./$(TARGET) < tests/teste1.pas

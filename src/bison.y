@@ -12,6 +12,7 @@
 int num_vars;
 int lexic_level = 0;
 std::list<Param> *params;
+std::list<Param> *expression_list_types;
 %}
 
 %require "3.7.4"
@@ -35,13 +36,15 @@ std::list<Param> *params;
     YY_DECL;
 }
 
-%type <tipo_variavel> variavel_func
-%type <tipo_variavel> fator
-%type <tipo_variavel> expressao_simples
-%type <tipo_variavel> expressao
-%type <tipo_variavel> termo
+%type <Param> variavel_func
+%type <Param> fator
+%type <Param> expressao_simples
+%type <Param> expressao
+%type <Param> termo
+
 %type <Simbolo*> variavel
 %type <std::string> ident
+
 %type <tipo_parametro> tipo_parametro
 %type <tipo_variavel> tipo
 
@@ -67,10 +70,12 @@ programa:
    {
       iniciaCompilador();
       geraCodigo("INPP");
+
+      insereRotulo(new Rotulo());
    }
    PROGRAM IDENT
    ABRE_PARENTESES lista_idents FECHA_PARENTESES PONTO_E_VIRGULA
-   bloco PONTO 
+   bloco_main PONTO 
    {
       geraCodigo("PARA");
       desligaCompilador();
@@ -78,9 +83,15 @@ programa:
 ;
 
 // 2. bloco -> parte_declara_vars comando_composto
-bloco:
-   parte_declara_vars
-   parte_declara_subrotinas
+bloco_main:
+   parte_declara_vars 
+   { 
+      desviaTopRotulo(); 
+   }
+   parte_declara_subrotinas 
+   { 
+      defineTopRotulo(); 
+   }
    comando_composto
    {
       if (!stack_block_var_count.empty()) {
@@ -93,6 +104,38 @@ bloco:
          }
       }
       visualizaTabela();
+   }
+;
+
+bloco:
+   { 
+      entraTopRotulo();
+      top_desloc = 0;
+      bottom_desloc = 0;
+   }
+   parte_declara_vars 
+   { 
+      desviaTopRotulo(); 
+   }
+   parte_declara_subrotinas 
+   comando_composto
+   {
+      if (!stack_block_var_count.empty()) {
+         int var_count = stack_block_var_count.top();
+         stack_block_var_count.pop();
+         if (var_count > 0) {
+            geraCodigo("DMEM", "", std::to_string(var_count));
+            removeSimbolos(var_count);
+            top_desloc -= var_count;
+         }
+      }
+      visualizaTabela();
+
+      Simbolo* simb = buscaSimbolo(0);
+      if (!simb->is_proc())
+         error("Suposto ser um simbolo de procedimento ou funcao");
+
+      geraCodigo("RTPR", "", std::to_string(simb->nivel_lexico), std::to_string(simb->parametros->size()));
    }
 ;
 
@@ -117,24 +160,24 @@ declara_vars:
 ; 
 
 declara_var:
-   lista_id_var DOIS_PONTOS tipo PONTO_E_VIRGULA
+   lista_var DOIS_PONTOS tipo PONTO_E_VIRGULA
    {
       colocaTipoEmSimbolos($3, num_same_type_vars);
       num_same_type_vars = 0;
    }
 ;
 
-lista_id_var: 
-   lista_id_var VIRGULA ident
+lista_var: 
+   lista_var VIRGULA ident
    { 
-      insereSimbolo(new Simbolo($3, lexic_level, top_desloc));
+      insereSimbolo(new Simbolo($3, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
    }
    | ident 
    { 
-      insereSimbolo(new Simbolo($1, lexic_level, top_desloc));
+      insereSimbolo(new Simbolo($1, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
@@ -151,19 +194,19 @@ ident:
 // 10. lista_idents -> lista_idents ',' IDENT | IDENT
 lista_idents: 
    lista_idents VIRGULA ident
-   {
-      insereSimbolo(new Simbolo($3, lexic_level, top_desloc));
+   /* {
+      insereSimbolo(new Simbolo($3, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
-   }
+   } */
    | ident
-   {
-      insereSimbolo(new Simbolo($1, lexic_level, top_desloc));
+   /* {
+      insereSimbolo(new Simbolo($1, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
-   }
+   } */
 ;
 
 /* Regra 11 - Parte de Declarações de Sub-Rotinas */
@@ -178,7 +221,7 @@ declaracao_procedimento:
    declaracao_procedimento_two
    bloco
    {
-      removeSimbolos(1);
+      removeRotulos(1);
       lexic_level--;
    }
 ;
@@ -186,15 +229,25 @@ declaracao_procedimento:
 declaracao_procedimento_two:
    PROCEDURE ident 
    {
-      params = new std::list<Param>();
-   }
-   ABRE_PARENTESES parametros_formais FECHA_PARENTESES PONTO_E_VIRGULA
-   {
       lexic_level++;
-      Simbolo *proce = new Simbolo($2, lexic_level, params, new Rotulo());
-
+      num_total_vars = 0;
+      
+      Rotulo* rotulo = new Rotulo();
+      insereRotulo(rotulo);
+      
+      params = new std::list<Param>();
+      Simbolo *proce = new Simbolo($2, lexic_level, params, rotulo);
       insereSimbolo(proce);
+
+      int var_count = stack_block_var_count.top();
+      stack_block_var_count.pop();
+      stack_block_var_count.push(var_count + 1);
    }
+   ABRE_PARENTESES parametros_formais
+   {
+      params = nullptr;
+   }
+   FECHA_PARENTESES PONTO_E_VIRGULA
 ;
 
 /* Regra 13 - Declaração de Função */
@@ -217,20 +270,6 @@ parametros_formais:
    | secao_parametros_formais_wrap
 ;
 
-tipo:
-   IDENT
-   {
-      if (simbolo_flex == "boolean")
-         $$ = t_bool;
-      else if (simbolo_flex == "integer")
-         $$ = t_int;
-      else {
-         $$ = t_undefined;
-         error("Tipo inválido\n");
-      }
-   }
-;
-
 secao_parametros_formais_wrap: 
    {
       num_same_type_vars = 0;
@@ -240,14 +279,33 @@ secao_parametros_formais_wrap:
 
 /* Regra 15 - Secao Parâmetros Formais */
 secao_parametros_formais:
-   tipo_parametro lista_idents DOIS_PONTOS tipo
+   tipo_parametro lista_params DOIS_PONTOS tipo
    {
       for(int i = 0; i < num_same_type_vars; i++) {
          params->push_back(Param($4, $1));
       }
 
       colocaTipoEmSimbolos($4, num_same_type_vars);
+      colocaTipoEmSimbolos($1, num_same_type_vars);
+
       num_same_type_vars = 0;
+   }
+;
+
+lista_params: 
+   lista_params VIRGULA ident
+   {
+      insereSimbolo(new Simbolo($3, lexic_level, -(4 + bottom_desloc), parametros_formais));
+      bottom_desloc++;
+      num_total_vars++;
+      num_same_type_vars++;
+   }
+   | ident
+   {
+      insereSimbolo(new Simbolo($1, lexic_level, -(4 + bottom_desloc), parametros_formais));
+      bottom_desloc++;
+      num_total_vars++;
+      num_same_type_vars++;
    }
 ;
 
@@ -288,11 +346,11 @@ comando:
 
 /* Regra 18 - Comando sem Rotulo - FALTA READ E WRITE*/
 comando_sem_rotulo:
-    /* atribuicao_ou_chamada_proc |*/
-   comando_composto
+   atribuicao
+   | chamada_procedimento 
+   | comando_composto
    | comando_repetitivo
    | comando_condicional
-   | atribuicao
 ;
 
 /* Regra 19 - Atribuicao */
@@ -301,10 +359,41 @@ atribuicao:
    ATRIBUICAO
    expressao
    {
-      if($1->tipo_v == $3)
-         geraCodigo("ARMZ", "", std::to_string($1->deslocamento), std::to_string($1->nivel_lexico));
+      if($1->tipo_v == $3.tipo_v)
+         geraCodigo("ARMZ", "", std::to_string($1->nivel_lexico),  std::to_string($1->deslocamento));
       else
-         error("Tipos incompatíveis na atribuição\n");
+         error("Tipos incompatíveis na atribuição");
+   }
+;
+
+/* Regra 20 - Chamada de Procedimento */
+chamada_procedimento:
+   variavel
+   {
+      if(!$1->is_proc())
+         error("Chamada de procedimento inválida");
+      if($1->parametros->size() != 0)
+         error("Número de parâmetros inválido");
+      geraCodigo("CHPR", "", $1->rotulo->identificador, std::to_string(lexic_level));
+   }
+   | variavel ABRE_PARENTESES 
+   {
+      expression_list_types = new std::list<Param>();
+   }
+   lista_de_expressoes FECHA_PARENTESES
+   {
+      Simbolo *proc = $1;
+      if(!proc->is_proc())
+         error("Chamada de procedimento inválida");
+      if(proc->parametros->size() != expression_list_types->size())
+         error("Número de parâmetros inválido");
+
+      for (auto it = proc->parametros->begin(), it_list = expression_list_types->begin(); it != proc->parametros->end(); ++it, ++it_list) {
+         if ((*it).tipo_v != (*it_list).tipo_v)
+            error("Tipos de parâmetros incompatíveis");
+      }
+      delete expression_list_types;
+      geraCodigo("CHPR", "", $1->rotulo->identificador, std::to_string(lexic_level));
    }
 ;
 
@@ -363,76 +452,82 @@ comando_repetitivo:
 expressao_booleana:
    expressao
    {
-      if($1 != t_bool)
-         error("Expressão booleana inválida\n");
+      if($1.tipo_v != t_bool)
+         error("Expressão booleana inválida");
    }
 ;
 
 // 24. 
 lista_de_expressoes:
    lista_de_expressoes VIRGULA expressao
+   {
+      expression_list_types->push_back($3);
+   }
    | expressao
+   {
+      expression_list_types->push_back($1);
+   }
 ;
 
 // 25 & 26..
 expressao: 
    expressao_simples MENOR_QUE expressao_simples 
    { 
-      $$ = aplicarOperacao("CMME", t_bool, $1, $3); 
+      $$ = aplicarOperacao("CMME", $1, $3); 
    }
    | expressao_simples MAIOR_QUE expressao_simples 
    { 
-      $$ = aplicarOperacao("CMMA", t_bool, $1, $3);
+      $$ = aplicarOperacao("CMMA", $1, $3);
    }
    | expressao_simples IGUAL expressao_simples 
    { 
-      $$ = aplicarOperacao("CMIG", t_bool, $1, $3);
+      $$ = aplicarOperacao("CMIG", $1, $3);
    }
    | expressao_simples DIFERENTE expressao_simples 
    { 
-      $$ = aplicarOperacao("CMDG", t_bool, $1, $3);
+      $$ = aplicarOperacao("CMDG", $1, $3);
    }
    | expressao_simples MAIOR_OU_IGUAL expressao_simples 
    { 
-      $$ = aplicarOperacao("CMAG", t_bool, $1, $3);
+      $$ = aplicarOperacao("CMAG", $1, $3);
    }
    | expressao_simples MENOR_OU_IGUAL expressao_simples 
    { 
-      $$ = aplicarOperacao("CMEG", t_bool, $1, $3);
+      $$ = aplicarOperacao("CMEG", $1, $3);
    }
-   | expressao_simples  // ToDo aplicarOperacao
+   | expressao_simples
 ;
 
 // 27.
-expressao_simples: //ToDo aplicarOperacao
+expressao_simples:
    expressao_simples MAIS termo  
    { 
-      $$ = aplicarOperacao("SOMA", t_int, $1, $3); 
+      $$ = aplicarOperacao("SOMA", $1, $3); 
    }
    | expressao_simples MENOS termo 
    { 
-      $$ = aplicarOperacao("SUBT", t_int, $1, $3); 
+      $$ = aplicarOperacao("SUBT", $1, $3); 
    }
    | expressao_simples OR termo 
    { 
-      $$ = aplicarOperacao("DISJ", t_bool, $1, $3); 
+      $$ = aplicarOperacao("DISJ", $1, $3); 
    }
    | termo
 ;
 
 // 28.
-termo: //ToDo aplicarOperacao
+termo:
    termo MULTI fator 
    { 
-      $$ = aplicarOperacao("MULT", t_int, $1, $3); 
+      $$ = aplicarOperacao("MULT", $1, $3); 
    }
    | termo DIV fator 
    { 
-      $$ = aplicarOperacao("DIVI", t_int, $1, $3); 
+      $$ = aplicarOperacao("DIVI", $1, $3); 
    }
    | termo AND fator 
    { 
-      $$ = aplicarOperacao("CONJ", t_bool, $1, $3); 
+      $$ = aplicarOperacao("CONJ", $1, $3); 
    } 
    | fator
 ;
@@ -442,17 +537,17 @@ fator:
    NUMERO 
    {
       geraCodigo("CRCT", "", simbolo_flex);
-      $$ = t_int;
+      $$ = Param(t_int, t_copy);
    }
    | TRUE 
    {
       geraCodigo("CRCT", "", "1");
-      $$ = t_bool;
+      $$ = Param(t_bool, t_copy);
    }
    | FALSE 
    {
       geraCodigo("CRCT", "", "0");
-      $$ = t_bool;
+      $$ = Param(t_bool, t_copy);
    }
    | ABRE_PARENTESES expressao FECHA_PARENTESES
    {
@@ -466,14 +561,23 @@ variavel_func:
    IDENT 
    {
       Simbolo* simbolo = buscaSimbolo(simbolo_flex);
-      if (simbolo == nullptr) {
-         std::cerr << "Variável não declarada: " << simbolo_flex << '\n';
-         exit(0);
-      }
       
-      $$ = simbolo->tipo_v;
+      $$ = Param(simbolo->tipo_v, simbolo->tipo_param);
+      geraCodigo("CRVL", "", std::to_string(simbolo->nivel_lexico), std::to_string(simbolo->deslocamento));
+   }
+;
 
-      geraCodigo("CRVL", "", std::to_string(simbolo->deslocamento), std::to_string(simbolo->nivel_lexico));
+tipo:
+   IDENT
+   {
+      if (simbolo_flex == "boolean")
+         $$ = t_bool;
+      else if (simbolo_flex == "integer")
+         $$ = t_int;
+      else {
+         $$ = t_undefined;
+         error("Tipo inválido");
+      }
    }
 ;
 

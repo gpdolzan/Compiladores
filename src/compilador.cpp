@@ -15,7 +15,7 @@ TabelaRotulos *tabela_rotulos;
 std::ofstream mepa_stream;
 std::string meu_token;
 int nl = 1, num_same_type_vars = 0, num_total_vars = 0, top_desloc = 0,
-    instruction_count = 0;
+    instruction_count = 0, bottom_desloc = 0;
 int D[4] = {0, 0, 0, 0};
 
 std::stack<int> stack_block_var_count;
@@ -29,7 +29,7 @@ void geraCodigo(const std::string &comando, const std::string &rot,
       if (arg2 == "")
         mepa_stream << "\t" << comando << " " << arg1 << std::endl;
       else
-        mepa_stream << "\t" << comando << " " << arg2 << ", " << arg1
+        mepa_stream << "\t" << comando << " " << arg1 << ", " << arg2
                     << std::endl;
     }
   } else {
@@ -55,21 +55,75 @@ void iniciaCompilador() {
 
 void desligaCompilador() {}
 
-tipo_variavel aplicarOperacao(const std::string &op,
-                              tipo_variavel necessary_type, tipo_variavel var1,
-                              tipo_variavel var2) {
-  if (!((var1 == var2) && (var1 == t_int)))
+Param aplicarOperacao(const std::string &op, Param var1, Param var2) {
+  tipo_variavel result_type;
+  tipo_variavel needed_type;
+
+  if (op == "CMME") {
+    result_type = t_bool;
+    needed_type = t_int;
+  } else if (op == "CMMA") {
+    result_type = t_bool;
+    needed_type = t_int;
+  } else if (op == "CMIG") {
+    result_type = t_bool;
+    needed_type = t_int;
+  } else if (op == "CMDG") {
+    result_type = t_bool;
+    needed_type = t_int;
+  } else if (op == "CMAG") {
+    result_type = t_bool;
+    needed_type = t_int;
+  } else if (op == "CMEG") {
+    result_type = t_bool;
+    needed_type = t_int;
+  } else if (op == "SOMA") {
+    result_type = t_int;
+    needed_type = t_int;
+  } else if (op == "SUBT") {
+    result_type = t_int;
+    needed_type = t_int;
+  } else if (op == "DISJ") {
+    result_type = t_bool;
+    needed_type = t_bool;
+  } else if (op == "MULT") {
+    result_type = t_int;
+    needed_type = t_int;
+  } else if (op == "DIVI") {
+    result_type = t_int;
+    needed_type = t_int;
+  } else if (op == "CONJ") {
+    result_type = t_bool;
+    needed_type = t_bool;
+  } else {
+    error("Operação desconhecida");
+  }
+
+  if ((var1.tipo_v != var2.tipo_v) || (var1.tipo_v != needed_type))
     error("type mismatch");
 
   geraCodigo(op);
 
-  return necessary_type;
+  tipo_parametro tipo_param = t_copy;
+  if (var1.tipo_param == t_pointer || var2.tipo_param == t_pointer)
+    tipo_param = t_pointer;
+
+  return Param(result_type, tipo_param);
 }
 
 void insereSimbolo(Simbolo *simb) { tabela_simb->push(simb); }
 
 Simbolo *buscaSimbolo(const std::string &simb) {
-  Simbolo *sim = tabela_simb->busca_simbolo(simb);
+  Simbolo *sim = tabela_simb->buscaSimbolo(simb);
+
+  if (sim == nullptr)
+    error("Variável não declarada: " + simbolo_flex);
+
+  return sim;
+}
+
+Simbolo *buscaSimbolo(int top_offset) {
+  Simbolo *sim = tabela_simb->buscaSimbolo(top_offset);
 
   if (sim == nullptr)
     error("Variável não declarada: " + simbolo_flex);
@@ -87,7 +141,11 @@ void colocaTipoEmSimbolos(tipo_variavel tipo, int quantidade) {
   tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
 }
 
-void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade){
+void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade) {
+  tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
+}
+
+void colocaTipoEmSimbolos(tipo_parametro tipo, int quantidade){
   tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
 }
 
@@ -95,7 +153,7 @@ void insereRotulo(Rotulo *rotulo) { tabela_rotulos->push(rotulo); }
 
 void removeRotulos(int quantidade) {
   for (int i = 0; i < quantidade; i++)
-    delete tabela_rotulos->pop();
+    tabela_rotulos->pop();
 }
 
 Rotulo *buscaRotulo(const std::string &simb) {
@@ -157,16 +215,35 @@ void start_else() {
   geraCodigo("NADA", start_else->identificador);
 }
 
-void end_else() { 
+void end_else() {
   Rotulo *end_if = buscaRotulo(0);
 
   geraCodigo("NADA", end_if->identificador);
 
-  removeRotulos(2); 
+  removeRotulos(2);
 }
 
 // espelho de bison::Parse::error
 void error(const std::string &msg) {
   std::cerr << msg << " at line " << nl << '\n';
   exit(0);
+}
+
+void entraTopRotulo() {
+  Rotulo *rot = buscaRotulo(0);
+  if (rot == nullptr)
+    error("Rotulo não encontrado em defineTopRotulo()");
+  geraCodigo("ENPR", rot->identificador);
+}
+
+void desviaTopRotulo() {
+  Rotulo *rot = buscaRotulo(0);
+  geraCodigo("DSVS", "", rot->identificador);
+}
+
+void defineTopRotulo() {
+  Rotulo *rot = buscaRotulo(0);
+  if (rot == nullptr)
+    error("Rotulo não encontrado em defineTopRotulo()");
+  geraCodigo("NADA", rot->identificador);
 }

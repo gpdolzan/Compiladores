@@ -1,6 +1,7 @@
 program proc2 (input, output);
 var x, y: integer;
-   procedure p(t:integer);
+   k: boolean;
+   procedure p(t:integer; var h: boolean);
    var z:integer;
    begin
       if (t>1)
@@ -10,5 +11,5 @@ var x, y: integer;
       y:=z*t;
    end;
 begin
-   x := x + y;
+   p(x, k)
 end.
