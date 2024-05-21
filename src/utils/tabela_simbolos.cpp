@@ -1,5 +1,7 @@
 #include "../../includes/utils/tabela_simbolos.hpp"
+#include <charconv>
 #include <iostream>
+#include <string>
 
 t_node *criar_nodo(Simbolo *simbolo, t_node *prev) {
   t_node *new_node = new t_node();
@@ -95,6 +97,31 @@ void TabelaSimbolos::coloca_tipo_em_simbolos(tipo_parametro tipo, int quantidade
   }
 }
 
+
+void TabelaSimbolos::coloca_desloc_em_params(int quantidade){
+    if (this->is_stack_empty()) {
+    std::cerr << "A tabela esta vazia\n";
+    return;
+  }
+
+  t_node *current = this->top;
+  int count = 0;
+  int bottom_desloc = -4;
+
+  while (current != nullptr && count < quantidade) {
+    current->simbolo->deslocamento = bottom_desloc;
+    current = current->prev;
+    count++;
+    bottom_desloc--;
+  }
+
+  if (count < quantidade) {
+    printf("Aviso: apenas %d símbolos foram modificados, pois a tabela contém "
+           "menos símbolos que a quantidade especificada.\n",
+           count);
+  }
+}
+
 int TabelaSimbolos::is_stack_empty() { return this->top == nullptr; }
 
 Simbolo *TabelaSimbolos::buscaSimbolo(const std::string &simb) {
@@ -174,13 +201,13 @@ void TabelaSimbolos::print_var_simbolo(Simbolo *simbolo) {
 void TabelaSimbolos::print_process_simbolo(Simbolo *simbolo) {
   printf("│ %-11s │ %-12s │ %-12s │ %-13d │ %-18s │ %-13s │ %-14s │ %-14s │\n",
          simbolo->identificador.c_str(),
-         "Procedimento",
-         "N/A",  // Tipo não aplicável
+         (simbolo->tipo_simbo == function ? "Funcao" : "Procedimento"),
+         (simbolo->tipo_simbo == function ? (simbolo->tipo_v == t_int ? "INT": "BOOL") : "N/A"),
          simbolo->nivel_lexico,
-         "N/A",  // Deslocamento não aplicável
+         (simbolo->tipo_simbo == function ? std::to_string(simbolo->deslocamento).c_str() : "N/A"),
          "N/A",  // Tipo Param Var não aplicável
-         "N/A",  // Tipo Parametro não aplicável
-         simbolo->rotulo != nullptr ? simbolo->rotulo->identificador.c_str() : "N/A");
+         (simbolo->tipo_simbo == function ? (simbolo->tipo_param == t_copy ? "Copia" : "Ponteiro") : "N/A"),
+         simbolo->rotulo_enpr() != nullptr ? simbolo->rotulo_enpr()->identificador.c_str() : "N/A");
 }
 
 void TabelaSimbolos::print_tabela() {

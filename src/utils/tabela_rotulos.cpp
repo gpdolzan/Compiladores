@@ -2,7 +2,12 @@
 
 int Rotulo::index = 0;
 
-Rotulo::Rotulo() : identificador("R" + std::to_string(index++)) {}
+Rotulo::Rotulo() {
+  if (index < 10)
+    this->identificador = "R0" + std::to_string(index++);
+  else
+    this->identificador = "R" + std::to_string(index++);
+}
 
 void TabelaRotulos::push(Rotulo *simbolo) { this->rotulos.push_back(simbolo); }
 
@@ -16,8 +21,9 @@ Rotulo *TabelaRotulos::busca_rotulo(const std::string &simb) {
   return nullptr;
 }
 
-Rotulo *TabelaRotulos::busca_rotulo(int top_offset){
-  for (auto deque = rotulos.rbegin(); deque != rotulos.rend(); ++deque, --top_offset) {
+Rotulo *TabelaRotulos::busca_rotulo(int top_offset) {
+  for (auto deque = rotulos.rbegin(); deque != rotulos.rend();
+       ++deque, --top_offset) {
     if (top_offset == 0) {
       return *deque;
     }

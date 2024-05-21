@@ -5,8 +5,6 @@
 #include <list>
 #include <string>
 
-#define TAM_SIMBOLO 48
-
 typedef enum {
   simb_program,
   simb_var,
@@ -57,7 +55,7 @@ typedef enum {
 
 typedef enum { t_int, t_bool, t_undefined } tipo_variavel;
 typedef enum { variavel_simples, parametros_formais } tipo_parametro_variavel;
-typedef enum { var, process, function } tipo_simbolo;
+typedef enum { var, process, function, main_process } tipo_simbolo;
 typedef enum { t_copy, t_pointer } tipo_parametro;
 
 class Param {
@@ -79,19 +77,28 @@ public:
         deslocamento{deslocamento} {}
 
   Simbolo(const std::string &identificador, int nivel_lexico,
-          std::list<Param> *parametros, Rotulo *rotulo)
-      : identificador{identificador}, tipo_simbo{process},
-        nivel_lexico{nivel_lexico}, parametros{parametros}, rotulo{rotulo} {}
+          std::list<Param> *parametros, tipo_simbolo tipo_simbo)
+      : identificador{identificador}, tipo_simbo{tipo_simbo},
+        nivel_lexico{nivel_lexico}, parametros{parametros} {}
 
   ~Simbolo() {
     if (parametros != nullptr)
       delete parametros;
 
-    // if (rotulo != nullptr)
-    //   delete rotulo;
+    if (rotulo_entrada_proce != nullptr)
+      delete rotulo_entrada_proce;
+
+    if (rotulo_entrada_begin != nullptr)
+      delete rotulo_entrada_begin;
   }
 
+  Rotulo *rotulo_enpr();
+  Rotulo *rotulo_begin();
+
   int is_proc();
+  int is_main();
+  int is_func();
+  int is_proc_or_func();
 
   std::string identificador;
   tipo_variavel tipo_v;
@@ -103,7 +110,12 @@ public:
 
   std::list<Param> *parametros = nullptr;
   tipo_simbolo tipo_simbo;
-  Rotulo *rotulo = nullptr;
+  int number_vars = 0;
+  int allow_return = 0;
+
+protected:
+  Rotulo *rotulo_entrada_proce = nullptr;
+  Rotulo *rotulo_entrada_begin = nullptr;
 };
 
 #endif

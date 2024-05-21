@@ -9,10 +9,15 @@
 #define flags(STR) std::cerr << "\033[1;31m" << STR << "\033[0m\n"
 #define flag std::cerr << "\033[1;31mFLAG\033[0m\n"
 
-int num_vars;
 int lexic_level = 0;
+int num_total_vars = 0;
+int num_total_params = 0;
+int num_same_type_vars = 0;
+int top_desloc = 0;
+
 std::list<Param> *params;
-std::list<Param> *expression_list_types;
+std::stack<std::list<Param>> expression_list_types = {};
+std::stack<std::stack<Param>> calling_proc_params = {};
 %}
 
 %require "3.7.4"
@@ -42,8 +47,15 @@ std::list<Param> *expression_list_types;
 %type <Param> expressao
 %type <Param> termo
 
+%type <Simbolo*> bloco
 %type <Simbolo*> variavel
+%type <Simbolo*> declaracao_procedimento
+%type <Simbolo*> declaracao_funcao
+%type <Simbolo*> chamada_procedimento_parametros
+%type <Simbolo*> chamada_funcao_sem_parametros
 %type <std::string> ident
+
+%type <int> parte_declara_vars
 
 %type <tipo_parametro> tipo_parametro
 %type <tipo_variavel> tipo
@@ -70,87 +82,75 @@ programa:
    {
       iniciaCompilador();
       geraCodigo("INPP");
-
-      insereRotulo(new Rotulo());
    }
    PROGRAM IDENT
    ABRE_PARENTESES lista_idents FECHA_PARENTESES PONTO_E_VIRGULA
-   bloco_main PONTO 
+   <Simbolo*>{
+      simbolo_main = new Simbolo("main", lexic_level, new std::list<Param>(), main_process);
+
+      $$ = simbolo_main;
+   }
+   bloco PONTO 
    {
       geraCodigo("PARA");
       desligaCompilador();
    }
 ;
 
-// 2. bloco -> parte_declara_vars comando_composto
-bloco_main:
-   parte_declara_vars 
-   { 
-      desviaTopRotulo(); 
-   }
-   parte_declara_subrotinas 
-   { 
-      defineTopRotulo(); 
-   }
-   comando_composto
-   {
-      if (!stack_block_var_count.empty()) {
-         int var_count = stack_block_var_count.top();
-         stack_block_var_count.pop();
-         if (var_count > 0) {
-            geraCodigo("DMEM", "", std::to_string(var_count));
-            removeSimbolos(var_count);
-            top_desloc -= var_count;
-         }
-      }
-      visualizaTabela();
-   }
-;
-
 bloco:
-   { 
-      entraTopRotulo();
+   <Simbolo*>{
+      Simbolo* proce = $<Simbolo*>0;
+      
+      if (proce->is_proc_or_func()) {
+         entraProce(proce);
+      } else if (!proce->is_main()) {
+         error("Suposto ser um simbolo de procedimento ou funcao, final do bloco de "
+               "declaracoes de subrotinas");
+      }
+
       top_desloc = 0;
-      bottom_desloc = 0;
+      $<Simbolo*>$ = proce;
    }
-   parte_declara_vars 
-   { 
-      desviaTopRotulo(); 
+   parte_declara_vars
+   <Simbolo*>{
+      $1->number_vars = $2;
+
+      $$ = $1;
    }
-   parte_declara_subrotinas 
+   parte_declara_subrotinas_wrap
+   {
+      if ($1->is_func())
+         $1->allow_return = true;
+   }
    comando_composto
    {
-      if (!stack_block_var_count.empty()) {
-         int var_count = stack_block_var_count.top();
-         stack_block_var_count.pop();
-         if (var_count > 0) {
-            geraCodigo("DMEM", "", std::to_string(var_count));
-            removeSimbolos(var_count);
-            top_desloc -= var_count;
-         }
-      }
+      Simbolo* proce = $1;
+
+      geraCodigo("DMEM", proce->number_vars);
+      removeSimbolos(proce->parametros->size() + proce->number_vars);
+
       visualizaTabela();
 
-      Simbolo* simb = buscaSimbolo(0);
-      if (!simb->is_proc())
-         error("Suposto ser um simbolo de procedimento ou funcao");
+      if (proce->is_proc_or_func())
+         geraCodigo("RTPR", proce->nivel_lexico, proce->parametros->size());
 
-      geraCodigo("RTPR", "", std::to_string(simb->nivel_lexico), std::to_string(simb->parametros->size()));
+      if (proce->is_func())
+         $1->allow_return = false;
    }
 ;
 
 // 8. Parte de Declaracoes de variaveis
 parte_declara_vars:  
-   { 
-      num_vars = 0;
-   } 
    VAR declara_vars 
    {
-      geraCodigo("AMEM", "", std::to_string(num_total_vars));
-      stack_block_var_count.push(num_total_vars);
+      geraCodigo("AMEM", num_total_vars);
+      $$ = num_total_vars;
       visualizaTabela();
    }
    | %empty
+   {
+      $$ = 0;
+   }
 ;
  
 // 9. Declaração de variáveis
@@ -160,9 +160,12 @@ declara_vars:
 ; 
 
 declara_var:
+   {
+      num_same_type_vars = 0;
+   }
    lista_var DOIS_PONTOS tipo PONTO_E_VIRGULA
    {
-      colocaTipoEmSimbolos($3, num_same_type_vars);
+      colocaTipoEmSimbolos($<tipo_variavel>4, num_same_type_vars);
       num_same_type_vars = 0;
    }
 ;
@@ -210,101 +213,131 @@ lista_idents:
 ;
 
 /* Regra 11 - Parte de Declarações de Sub-Rotinas */
-parte_declara_subrotinas:
-    parte_declara_subrotinas declaracao_procedimento PONTO_E_VIRGULA 
-    | parte_declara_subrotinas declaracao_funcao PONTO_E_VIRGULA 
-    | %empty
+parte_declara_subrotinas_wrap:
+   {
+      Simbolo *proc = $<Simbolo*>0;
+
+      geraCodigo("DSVS", "", proc->rotulo_begin()->identificador);
+   }
+   parte_declara_subrotinas
+   { 
+      Simbolo *proc = $<Simbolo*>0;
+
+      geraCodigo("NADA", proc->rotulo_begin()->identificador); 
+   }
+   | %empty
 ;
 
-/* Regra 12 - Declaração de Procedimento */
-declaracao_procedimento:
-   declaracao_procedimento_two
-   bloco
+parte_declara_subrotinas:
+   parte_declara_subrotinas parte_declara_subrotinas_two
+   | parte_declara_subrotinas_two 
+;
+
+parte_declara_subrotinas_two:
+   declaracao_procedimento bloco PONTO_E_VIRGULA
    {
-      removeRotulos(1);
+      lexic_level--;
+   }
+   | declaracao_funcao
+   bloco PONTO_E_VIRGULA
+   {
       lexic_level--;
    }
 ;
 
-declaracao_procedimento_two:
-   PROCEDURE ident 
-   {
+/* Regra 12 - Declaração de Procedimento */
+declaracao_procedimento:
+   PROCEDURE ident
+   <Simbolo*>{
       lexic_level++;
       num_total_vars = 0;
-      
-      Rotulo* rotulo = new Rotulo();
-      insereRotulo(rotulo);
+      num_total_params = 0;
       
       params = new std::list<Param>();
-      Simbolo *proce = new Simbolo($2, lexic_level, params, rotulo);
+      Simbolo *proce = new Simbolo($2, lexic_level, params, process);
       insereSimbolo(proce);
 
-      int var_count = stack_block_var_count.top();
-      stack_block_var_count.pop();
-      stack_block_var_count.push(var_count + 1);
+      $$ = proce;
    }
-   ABRE_PARENTESES parametros_formais
+   declaracao_params PONTO_E_VIRGULA
    {
-      params = nullptr;
+      $$ = $3;
    }
-   FECHA_PARENTESES PONTO_E_VIRGULA
 ;
 
 /* Regra 13 - Declaração de Função */
 declaracao_funcao:
-    FUNCTION IDENT 
-    parametros_formais 
-    {
-      num_vars = 0;
-    }
-    DOIS_PONTOS IDENT PONTO_E_VIRGULA
-    bloco
-    {
-        // Configura ambiente de função no MEPA
-    }
+   FUNCTION ident
+   <Simbolo*>{
+      lexic_level++;
+      num_total_vars = 0;
+      num_total_params = 0;
+      
+      params = new std::list<Param>();
+      Simbolo *proce = new Simbolo($2, lexic_level, params, function);
+      insereSimbolo(proce);
+      
+      $$ = proce;
+   }
+   declaracao_params DOIS_PONTOS tipo PONTO_E_VIRGULA
+   {
+      $$ = $3;
+      $3->tipo_param = t_copy;
+      $3->deslocamento = -(4 + num_total_params);
+      $3->tipo_v = $6;
+   }
+;
+
+declaracao_params:
+   ABRE_PARENTESES parametros_formais
+   {
+      colocaDeslocEmParams(num_total_params);
+      
+      params = nullptr;
+   }
+   FECHA_PARENTESES
+   | %empty
+   {
+      params = nullptr;
+   }
 ;
 
 /* Regra 14 - Parâmetros Formais */
 parametros_formais:
-   parametros_formais PONTO_E_VIRGULA secao_parametros_formais_wrap
-   | secao_parametros_formais_wrap
-;
-
-secao_parametros_formais_wrap: 
-   {
-      num_same_type_vars = 0;
-   }
-   secao_parametros_formais
+   parametros_formais PONTO_E_VIRGULA secao_parametros_formais
+   | secao_parametros_formais
 ;
 
 /* Regra 15 - Secao Parâmetros Formais */
 secao_parametros_formais:
+   {
+      num_same_type_vars = 0;
+   }
    tipo_parametro lista_params DOIS_PONTOS tipo
    {
+      tipo_variavel tipo_v = $<tipo_variavel>5;
+      tipo_parametro tipo_param = $<tipo_parametro>2;
+
       for(int i = 0; i < num_same_type_vars; i++) {
-         params->push_back(Param($4, $1));
+         params->push_back(Param(tipo_v, tipo_param));
       }
 
-      colocaTipoEmSimbolos($4, num_same_type_vars);
-      colocaTipoEmSimbolos($1, num_same_type_vars);
-
-      num_same_type_vars = 0;
+      colocaTipoEmSimbolos(tipo_v, num_same_type_vars);
+      colocaTipoEmSimbolos(tipo_param, num_same_type_vars);
    }
 ;
 
 lista_params: 
-   lista_params VIRGULA ident
+   lista_params VIRGULA ident 
    {
-      insereSimbolo(new Simbolo($3, lexic_level, -(4 + bottom_desloc), parametros_formais));
-      bottom_desloc++;
-      num_total_vars++;
+      insereSimbolo(new Simbolo($3, lexic_level, 0, parametros_formais));
+      num_total_params++;
       num_same_type_vars++;
    }
    | ident
    {
-      insereSimbolo(new Simbolo($1, lexic_level, -(4 + bottom_desloc), parametros_formais));
-      bottom_desloc++;
-      num_total_vars++;
+      insereSimbolo(new Simbolo($1, lexic_level, 0, parametros_formais));
+      num_total_params++;
       num_same_type_vars++;
    }
 ;
@@ -322,32 +355,25 @@ tipo_parametro:
 
 /* Regra 16 - Comando Composto */
 comando_composto:
-   {
-      /* Imprimir o Debug */
-   }
    T_BEGIN lista_comandos T_END
-   {
-      // Ação para iniciar bloco de comandos no MEPA
-   }
 ;
 
 lista_comandos:
    lista_comandos PONTO_E_VIRGULA comando
    | comando
-   | %empty
 ;
 
 /* Regra 17 - Comando */
 comando:
    NUMERO DOIS_PONTOS comando_sem_rotulo
    | comando_sem_rotulo
-   |%empty
+   | %empty
 ;
 
 /* Regra 18 - Comando sem Rotulo - FALTA READ E WRITE*/
 comando_sem_rotulo:
    atribuicao
-   | chamada_procedimento 
+   | chamada_procedimento
    | comando_composto
    | comando_repetitivo
    | comando_condicional
@@ -370,12 +396,12 @@ lista_read:
    lista_read VIRGULA variavel
    {
       geraCodigo("LEIT");
-      geraCodigo("ARMZ", "", std::to_string($3->nivel_lexico),  std::to_string($3->deslocamento));
+      aplicarArmazena($3);
    }
    | variavel
    {
       geraCodigo("LEIT");
-      geraCodigo("ARMZ", "", std::to_string($1->nivel_lexico),  std::to_string($1->deslocamento));
+      aplicarArmazena($1);
    }
 ;
 
@@ -386,8 +412,12 @@ atribuicao:
    ATRIBUICAO
    expressao
    {
+      if($1->is_func())
+         if(!$1->allow_return)
+            error("Função não pode ser usada como variável");
+      
       if($1->tipo_v == $3.tipo_v)
-         geraCodigo("ARMZ", "", std::to_string($1->nivel_lexico),  std::to_string($1->deslocamento));
+         aplicarArmazena($1);
       else
          error("Tipos incompatíveis na atribuição");
    }
@@ -397,30 +427,69 @@ atribuicao:
 chamada_procedimento:
    variavel
    {
-      if(!$1->is_proc())
+      if(!$1->is_proc_or_func())
          error("Chamada de procedimento inválida");
       if($1->parametros->size() != 0)
          error("Número de parâmetros inválido");
-      geraCodigo("CHPR", "", $1->rotulo->identificador, std::to_string(lexic_level));
+      geraCodigo("CHPR", "", $1->rotulo_enpr()->identificador, std::to_string(lexic_level));
    }
-   | variavel ABRE_PARENTESES 
+   | chamada_procedimento_parametros
    {
-      expression_list_types = new std::list<Param>();
+      if($1->is_func())
+         geraCodigo("DMEM", 1);
+   }
+;
+
+chamada_procedimento_parametros:
+   variavel ABRE_PARENTESES 
+   {
+      Simbolo *proc = $1;
+
+      if(!proc->is_proc_or_func())
+         error("Chamada de procedimento inválida");
+      
+      expression_list_types.push({});
+      calling_proc_params.push({});
+
+      if(proc->is_func())
+         geraCodigo("AMEM", 1);
+
+      for(auto it = proc->parametros->rbegin(); it != proc->parametros->rend(); ++it) {
+         calling_proc_params.top().push(*it);
+      }
    }
    lista_de_expressoes FECHA_PARENTESES
    {
       Simbolo *proc = $1;
-      if(!proc->is_proc())
-         error("Chamada de procedimento inválida");
-      if(proc->parametros->size() != expression_list_types->size())
+      if(proc->parametros->size() != expression_list_types.top().size())
          error("Número de parâmetros inválido");
 
-      for (auto it = proc->parametros->begin(), it_list = expression_list_types->begin(); it != proc->parametros->end(); ++it, ++it_list) {
+      for (auto it = proc->parametros->begin(), it_list = expression_list_types.top().begin(); it != proc->parametros->end(); ++it, ++it_list) {
          if ((*it).tipo_v != (*it_list).tipo_v)
             error("Tipos de parâmetros incompatíveis");
       }
-      delete expression_list_types;
-      geraCodigo("CHPR", "", $1->rotulo->identificador, std::to_string(lexic_level));
+
+      geraCodigo("CHPR", "", $1->rotulo_enpr()->identificador, std::to_string(lexic_level));
+      
+      expression_list_types.pop();
+      calling_proc_params.pop();
+
+      $$ = $1;
+   }
+;
+
+chamada_funcao_sem_parametros:
+   variavel ABRE_PARENTESES FECHA_PARENTESES
+   {
+      Simbolo *proc = $1;
+
+      if(!proc->is_func())
+         error("Chamada de função inválida");
+      
+      geraCodigo("AMEM", 1);
+      geraCodigo("CHPR", "", $1->rotulo_enpr()->identificador, std::to_string(lexic_level));
+      
+      $$ = $1;
    }
 ;
 
@@ -488,11 +557,17 @@ expressao_booleana:
 lista_de_expressoes:
    lista_de_expressoes VIRGULA expressao
    {
-      expression_list_types->push_back($3);
+      expression_list_types.top().push_back($3);
+      if(calling_proc_params.top().empty())
+         error("Número de parâmetros inválido");
+      calling_proc_params.top().pop();
    }
    | expressao
    {
-      expression_list_types->push_back($1);
+      expression_list_types.top().push_back($1);
+      if(calling_proc_params.top().empty())
+         error("Número de parâmetros inválido");
+      calling_proc_params.top().pop();
    }
 ;
 
@@ -568,12 +643,12 @@ fator:
    }
    | TRUE 
    {
-      geraCodigo("CRCT", "", "1");
+      geraCodigo("CRCT", 1);
       $$ = Param(t_bool, t_copy);
    }
    | FALSE 
    {
-      geraCodigo("CRCT", "", "0");
+      geraCodigo("CRCT", 0);
       $$ = Param(t_bool, t_copy);
    }
    | ABRE_PARENTESES expressao FECHA_PARENTESES
@@ -585,12 +660,41 @@ fator:
 
 // 30.
 variavel_func:
-   IDENT 
+   variavel 
    {
-      Simbolo* simbolo = buscaSimbolo(simbolo_flex);
+      Simbolo* simbolo = $1;
+      
+      if(simbolo->is_proc_or_func() )
+         error("Variável não pode ser um procedimento");
+      
+      if(!calling_proc_params.empty()) {
+         if(calling_proc_params.top().empty())
+            error("Número de parâmetros inválido");
+         
+         Param param = calling_proc_params.top().top();
+
+         aplicarCarrega(simbolo, param);
+      } else {
+         aplicarCarrega(simbolo);
+      }
       
       $$ = Param(simbolo->tipo_v, simbolo->tipo_param);
-      geraCodigo("CRVL", "", std::to_string(simbolo->nivel_lexico), std::to_string(simbolo->deslocamento));
+   }
+   | chamada_procedimento_parametros
+   {
+      Simbolo* proc = $1;
+      if(!proc->is_func())
+         error("Chamada de função inválida");
+
+      $$ = Param(proc->tipo_v, proc->tipo_param);
+   }
+   | chamada_funcao_sem_parametros
+   {
+      Simbolo* proc = $1;
+      if(!proc->is_func())
+         error("Chamada de função inválida");
+
+      $$ = Param(proc->tipo_v, proc->tipo_param);
    }
 ;
 

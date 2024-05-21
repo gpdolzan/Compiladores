@@ -6,49 +6,55 @@
 #include <iostream>
 #include <string>
 
+// External variables
 std::string simbolo_flex;
-flex_simbolos relacao;
-char token[TAM_SIMBOLO];
+Simbolo *simbolo_main;
+int nl = 1, instruction_count = 0;
+
+// Compiler variables
 TabelaSimbolos *tabela_simb;
 TabelaRotulos *tabela_rotulos;
-
 std::ofstream mepa_stream;
-std::string meu_token;
-int nl = 1, num_same_type_vars = 0, num_total_vars = 0, top_desloc = 0,
-    instruction_count = 0, bottom_desloc = 0;
-int D[4] = {0, 0, 0, 0};
 
-std::stack<int> stack_block_var_count;
+void geraCodigo(const std::string &comando, int arg1) {
+  mepa_stream << "     " << comando << " " << arg1 << std::endl;
+
+  instruction_count++;
+  mepa_stream.flush();
+}
+
+void geraCodigo(const std::string &comando, int arg1, int arg2) {
+  mepa_stream << "     " << comando << " " << arg1 << ", " << arg2 << std::endl;
+
+  instruction_count++;
+  mepa_stream.flush();
+}
 
 void geraCodigo(const std::string &comando, const std::string &rot,
                 const std::string &arg1, const std::string &arg2) {
-  if (rot == "") {
-    if (arg1 == "")
-      mepa_stream << "\t" << comando << std::endl;
-    else {
-      if (arg2 == "")
-        mepa_stream << "\t" << comando << " " << arg1 << std::endl;
-      else
-        mepa_stream << "\t" << comando << " " << arg1 << ", " << arg2
-                    << std::endl;
-    }
-  } else {
-    mepa_stream << rot << ": " << comando << std::endl;
+  if (rot != "")
+    mepa_stream << rot << ": ";
+  else
+    mepa_stream << "     ";
+
+  if (arg1 == "")
+    mepa_stream << comando;
+  else {
+    if (arg2 == "")
+      mepa_stream << comando << " " << arg1;
+    else
+      mepa_stream << comando << " " << arg1 << ", " << arg2;
   }
+  mepa_stream << std::endl;
 
   instruction_count++;
 
   mepa_stream.flush();
 }
 
-int imprimeErro(const std::string &erro) {
-  // fprintf(stderr, "Erro na linha %d - %s\n", nl, erro);
-  // exit(-1);
-  return 1;
-}
-
 void iniciaCompilador() {
   mepa_stream.open("mepa.txt", std::ofstream::out);
+
   tabela_simb = new TabelaSimbolos;
   tabela_rotulos = new TabelaRotulos;
 }
@@ -145,8 +151,12 @@ void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade) {
   tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
 }
 
-void colocaTipoEmSimbolos(tipo_parametro tipo, int quantidade){
+void colocaTipoEmSimbolos(tipo_parametro tipo, int quantidade) {
   tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
+}
+
+void colocaDeslocEmParams(int quantidade) {
+  tabela_simb->coloca_desloc_em_params(quantidade);
 }
 
 void insereRotulo(Rotulo *rotulo) { tabela_rotulos->push(rotulo); }
@@ -229,21 +239,54 @@ void error(const std::string &msg) {
   exit(0);
 }
 
-void entraTopRotulo() {
-  Rotulo *rot = buscaRotulo(0);
-  if (rot == nullptr)
-    error("Rotulo não encontrado em defineTopRotulo()");
-  geraCodigo("ENPR", rot->identificador);
+void entraProce(Simbolo *simb) {
+  geraCodigo("ENPR", simb->rotulo_enpr()->identificador,
+             std::to_string(simb->nivel_lexico));
 }
 
-void desviaTopRotulo() {
-  Rotulo *rot = buscaRotulo(0);
-  geraCodigo("DSVS", "", rot->identificador);
+void aplicarArmazena(Simbolo *simb) {
+  std::string comando;
+  if (simb->tipo_param == t_copy)
+    comando = "ARMZ";
+  else if (simb->tipo_param == t_pointer)
+    comando = "ARMI";
+  else
+    error("Tipo param de variável inexistente");
+
+  geraCodigo(comando, simb->nivel_lexico, simb->deslocamento);
 }
 
-void defineTopRotulo() {
-  Rotulo *rot = buscaRotulo(0);
-  if (rot == nullptr)
-    error("Rotulo não encontrado em defineTopRotulo()");
-  geraCodigo("NADA", rot->identificador);
+void aplicarCarrega(Simbolo *simb) {
+  std::string comando;
+  if (simb->tipo_param == t_copy)
+    comando = "CRVL";
+  else if (simb->tipo_param == t_pointer)
+    comando = "CRVI";
+  else
+    error("Tipo param de variável inexistente");
+
+  geraCodigo(comando, simb->nivel_lexico, simb->deslocamento);
+}
+
+void aplicarCarrega(Simbolo *simb, const Param &param) {
+  std::string comando;
+  if (param.tipo_param == t_copy) {
+    if (simb->tipo_param == t_copy)
+      comando = "CRVL";
+    else if (simb->tipo_param == t_pointer)
+      comando = "CRVI";
+    else
+      error("Tipo param de variável inexistente");
+  } else if (param.tipo_param == t_pointer) {
+    if (simb->tipo_param == t_copy)
+      comando = "CREN";
+    else if (simb->tipo_param == t_pointer)
+      comando = "CRVL";
+    else
+      error("Tipo param de variável inexistente");
+  } else {
+    error("Tipo param de variável inexistente");
+  }
+
+  geraCodigo(comando, simb->nivel_lexico, simb->deslocamento);
 }

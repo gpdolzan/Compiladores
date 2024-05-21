@@ -11,11 +11,9 @@
 #define print
 
 extern std::string simbolo_flex;
-extern flex_simbolos relacao;
-extern char token[TAM_SIMBOLO];
-extern int nl, num_same_type_vars, num_total_vars, nivel_lexico, desloc, D[4],
-    top_desloc, instruction_count, bottom_desloc;
-extern std::stack<int> stack_block_var_count;
+extern Simbolo *simbolo_main;
+
+extern int nl, instruction_count;
 
 /* -------------------------------------------------------------------
  * prototipos globais
@@ -23,6 +21,9 @@ extern std::stack<int> stack_block_var_count;
 
 void geraCodigo(const std::string &comando, const std::string &rot = "",
                 const std::string &arg1 = "", const std::string &arg2 = "");
+void geraCodigo(const std::string &comando, int arg1);
+void geraCodigo(const std::string &comando, int arg1, int arg2);
+
 int yylex();
 void yyerror(const std::string &s);
 
@@ -36,6 +37,12 @@ void removeSimbolos(int quant);
 void colocaTipoEmSimbolos(tipo_variavel tipo, int quantidade);
 void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade);
 void colocaTipoEmSimbolos(tipo_parametro tipo, int quantidade);
+
+void colocaDeslocEmParams(int quantidade);
+
+void aplicarArmazena(Simbolo* simb);
+void aplicarCarrega(Simbolo* simb);
+void aplicarCarrega(Simbolo* simb, const Param& param);
 
 void insereRotulo(Rotulo *rotulo);
 void removeRotulos(int quantidade);
@@ -51,9 +58,7 @@ void end_if();
 void start_else();
 void end_else();
 
-void entraTopRotulo();
-void desviaTopRotulo();
-void defineTopRotulo();
+void entraProce(Simbolo *simb);
 
 void visualizaTabela();
 void error(const std::string &msg);
