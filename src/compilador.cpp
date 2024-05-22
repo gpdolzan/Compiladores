@@ -59,7 +59,12 @@ void iniciaCompilador() {
   tabela_rotulos = new TabelaRotulos;
 }
 
-void desligaCompilador() {}
+void desligaCompilador() {
+  mepa_stream.close();
+
+  // delete tabela_simb;
+  delete tabela_rotulos;
+}
 
 Param aplicarOperacao(const std::string &op, Param var1, Param var2) {
   tipo_variavel result_type;
@@ -139,7 +144,7 @@ Simbolo *buscaSimbolo(int top_offset) {
 
 void removeSimbolos(int quant) {
   for (int i = 0; i < quant; i++) {
-    delete tabela_simb->pop();
+    tabela_simb->pop();
   }
 }
 
@@ -164,10 +169,6 @@ void insereRotulo(Rotulo *rotulo) { tabela_rotulos->push(rotulo); }
 void removeRotulos(int quantidade) {
   for (int i = 0; i < quantidade; i++)
     tabela_rotulos->pop();
-}
-
-Rotulo *buscaRotulo(const std::string &simb) {
-  return tabela_rotulos->busca_rotulo(simb);
 }
 
 Rotulo *buscaRotulo(int top_offset) {

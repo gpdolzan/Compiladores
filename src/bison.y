@@ -49,6 +49,7 @@ std::stack<std::stack<Param>> calling_proc_params = {};
 
 %type <Simbolo*> bloco
 %type <Simbolo*> variavel
+%type <Simbolo*> chamada_sem_pametro
 %type <Simbolo*> declaracao_procedimento
 %type <Simbolo*> declaracao_funcao
 %type <Simbolo*> chamada_procedimento_parametros
@@ -78,7 +79,7 @@ std::stack<std::stack<Param>> calling_proc_params = {};
 %%
 
 // 1. programa -> PROGRAM IDENT '(' lista_idents ')' ';' bloco '.'
-programa:   
+programa:  
    {
       iniciaCompilador();
       geraCodigo("INPP");
@@ -103,7 +104,7 @@ bloco:
       
       if (proce->is_proc_or_func()) {
          entraProce(proce);
-      } else if (!proce->is_main()) {
+      }else if (!proce->is_main()) {
          error("Suposto ser um simbolo de procedimento ou funcao, final do bloco de "
                "declaracoes de subrotinas");
       }
@@ -126,8 +127,10 @@ bloco:
    {
       Simbolo* proce = $1;
 
+      if(!proce->is_main())
+         removeSimbolos(proce->parametros->size() + proce->number_vars);
+
       geraCodigo("DMEM", proce->number_vars);
-      removeSimbolos(proce->parametros->size() + proce->number_vars);
 
       visualizaTabela();
 
@@ -140,7 +143,7 @@ bloco:
 ;
 
 // 8. Parte de Declaracoes de variaveis
-parte_declara_vars:  
+parte_declara_vars: 
    VAR declara_vars 
    {
       geraCodigo("AMEM", num_total_vars);
@@ -154,10 +157,10 @@ parte_declara_vars:
 ;
  
 // 9. Declaração de variáveis
-declara_vars: 
+declara_vars:
    declara_vars declara_var
    | declara_var
-; 
+;
 
 declara_var:
    {
@@ -170,16 +173,16 @@ declara_var:
    }
 ;
 
-lista_var: 
+lista_var:
    lista_var VIRGULA ident
-   { 
+   {
       insereSimbolo(new Simbolo($3, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
    }
    | ident 
-   { 
+   {
       insereSimbolo(new Simbolo($1, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
@@ -187,7 +190,7 @@ lista_var:
    }
 ;
 
-ident: 
+ident:
    IDENT
    {
       $$ = simbolo_flex;
@@ -195,21 +198,21 @@ ident:
 ;
 
 // 10. lista_idents -> lista_idents ',' IDENT | IDENT
-lista_idents: 
+lista_idents:
    lista_idents VIRGULA ident
    /* {
       insereSimbolo(new Simbolo($3, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
-   } */
+   }*/
    | ident
    /* {
       insereSimbolo(new Simbolo($1, lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
-   } */
+   }*/
 ;
 
 /* Regra 11 - Parte de Declarações de Sub-Rotinas */
@@ -220,10 +223,10 @@ parte_declara_subrotinas_wrap:
       geraCodigo("DSVS", "", proc->rotulo_begin()->identificador);
    }
    parte_declara_subrotinas
-   { 
+   {
       Simbolo *proc = $<Simbolo*>0;
 
-      geraCodigo("NADA", proc->rotulo_begin()->identificador); 
+      geraCodigo("NADA", proc->rotulo_begin()->identificador);
    }
    | %empty
 ;
@@ -318,7 +321,7 @@ secao_parametros_formais:
       tipo_variavel tipo_v = $<tipo_variavel>5;
       tipo_parametro tipo_param = $<tipo_parametro>2;
 
-      for(int i = 0; i < num_same_type_vars; i++) {
+      for(int i = 0;i < num_same_type_vars;i++) {
          params->push_back(Param(tipo_v, tipo_param));
       }
 
@@ -327,7 +330,7 @@ secao_parametros_formais:
    }
 ;
 
-lista_params: 
+lista_params:
    lista_params VIRGULA ident 
    {
       insereSimbolo(new Simbolo($3, lexic_level, 0, parametros_formais));
@@ -425,18 +428,33 @@ atribuicao:
 
 /* Regra 20 - Chamada de Procedimento */
 chamada_procedimento:
-   variavel
+   chamada_sem_pametro
    {
       if(!$1->is_proc_or_func())
          error("Chamada de procedimento inválida");
       if($1->parametros->size() != 0)
          error("Número de parâmetros inválido");
+      if($1->is_func())
+         geraCodigo("AMEM", 1);
       geraCodigo("CHPR", "", $1->rotulo_enpr()->identificador, std::to_string(lexic_level));
+      if($1->is_func())
+         geraCodigo("DMEM", 1);
    }
    | chamada_procedimento_parametros
    {
       if($1->is_func())
          geraCodigo("DMEM", 1);
+   }
+;
+
+chamada_sem_pametro:
+   variavel
+   {
+      $$ = $1;
+   }
+   | variavel ABRE_PARENTESES FECHA_PARENTESES
+   {
+      $$ = $1;
    }
 ;
 
@@ -454,7 +472,7 @@ chamada_procedimento_parametros:
       if(proc->is_func())
          geraCodigo("AMEM", 1);
 
-      for(auto it = proc->parametros->rbegin(); it != proc->parametros->rend(); ++it) {
+      for(auto it = proc->parametros->rbegin();it != proc->parametros->rend();++it) {
          calling_proc_params.top().push(*it);
       }
    }
@@ -464,7 +482,7 @@ chamada_procedimento_parametros:
       if(proc->parametros->size() != expression_list_types.top().size())
          error("Número de parâmetros inválido");
 
-      for (auto it = proc->parametros->begin(), it_list = expression_list_types.top().begin(); it != proc->parametros->end(); ++it, ++it_list) {
+      for (auto it = proc->parametros->begin(), it_list = expression_list_types.top().begin();it != proc->parametros->end();++it, ++it_list) {
          if ((*it).tipo_v != (*it_list).tipo_v)
             error("Tipos de parâmetros incompatíveis");
       }
@@ -524,7 +542,7 @@ cond_else:
       end_else();
    }
    | %prec LOWER_THAN_ELSE %empty
-   { 
+   {
       end_if();
    }
 ;
@@ -538,7 +556,7 @@ comando_repetitivo:
    expressao_booleana DO 
    {
       do_while();
-   } 
+   }
    comando_sem_rotulo
    {
       end_while();
@@ -572,29 +590,29 @@ lista_de_expressoes:
 ;
 
 // 25 & 26..
-expressao: 
-   expressao_simples MENOR_QUE expressao_simples 
-   { 
-      $$ = aplicarOperacao("CMME", $1, $3); 
+expressao:
+   expressao_simples MENOR_QUE expressao_simples
+   {
+      $$ = aplicarOperacao("CMME", $1, $3);
    }
-   | expressao_simples MAIOR_QUE expressao_simples 
-   { 
+   | expressao_simples MAIOR_QUE expressao_simples
+   {
       $$ = aplicarOperacao("CMMA", $1, $3);
    }
-   | expressao_simples IGUAL expressao_simples 
-   { 
+   | expressao_simples IGUAL expressao_simples
+   {
       $$ = aplicarOperacao("CMIG", $1, $3);
    }
-   | expressao_simples DIFERENTE expressao_simples 
-   { 
+   | expressao_simples DIFERENTE expressao_simples
+   {
       $$ = aplicarOperacao("CMDG", $1, $3);
    }
-   | expressao_simples MAIOR_OU_IGUAL expressao_simples 
-   { 
+   | expressao_simples MAIOR_OU_IGUAL expressao_simples
+   {
       $$ = aplicarOperacao("CMAG", $1, $3);
    }
-   | expressao_simples MENOR_OU_IGUAL expressao_simples 
-   { 
+   | expressao_simples MENOR_OU_IGUAL expressao_simples
+   {
       $$ = aplicarOperacao("CMEG", $1, $3);
    }
    | expressao_simples
@@ -603,16 +621,16 @@ expressao:
 // 27.
 expressao_simples:
    expressao_simples MAIS termo  
-   { 
-      $$ = aplicarOperacao("SOMA", $1, $3); 
+   {
+      $$ = aplicarOperacao("SOMA", $1, $3);
    }
    | expressao_simples MENOS termo 
-   { 
-      $$ = aplicarOperacao("SUBT", $1, $3); 
+   {
+      $$ = aplicarOperacao("SUBT", $1, $3);
    }
    | expressao_simples OR termo 
-   { 
-      $$ = aplicarOperacao("DISJ", $1, $3); 
+   {
+      $$ = aplicarOperacao("DISJ", $1, $3);
    }
    | termo
 ;
@@ -620,17 +638,17 @@ expressao_simples:
 // 28.
 termo:
    termo MULTI fator 
-   { 
-      $$ = aplicarOperacao("MULT", $1, $3); 
+   {
+      $$ = aplicarOperacao("MULT", $1, $3);
    }
    | termo DIV fator 
-   { 
-      $$ = aplicarOperacao("DIVI", $1, $3); 
+   {
+      $$ = aplicarOperacao("DIVI", $1, $3);
    }
    | termo AND fator 
-   { 
-      $$ = aplicarOperacao("CONJ", $1, $3); 
-   } 
+   {
+      $$ = aplicarOperacao("CONJ", $1, $3);
+   }
    | fator
 ;
 
@@ -664,7 +682,7 @@ variavel_func:
    {
       Simbolo* simbolo = $1;
       
-      if(simbolo->is_proc_or_func() )
+      if(simbolo->is_proc_or_func())
          error("Variável não pode ser um procedimento");
       
       if(!calling_proc_params.empty()) {

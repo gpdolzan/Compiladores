@@ -5,6 +5,10 @@
 
 class t_node {
 public:
+  ~t_node() {
+    delete simbolo;
+  }
+
   t_node *next;
   t_node *prev;
 
@@ -15,8 +19,10 @@ class TabelaSimbolos {
 public:
   TabelaSimbolos() : top(nullptr), bottom(nullptr){};
 
+  ~TabelaSimbolos();
+
   void push(Simbolo *simbolo);
-  Simbolo *pop();
+  void pop();
   Simbolo *buscaSimbolo(const std::string &simb);
   Simbolo *buscaSimbolo(int top_offset);
 

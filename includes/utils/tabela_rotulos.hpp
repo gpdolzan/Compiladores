@@ -18,7 +18,7 @@ public:
   TabelaRotulos() : rotulos{std::deque<Rotulo *>()} {};
 
   void push(Rotulo *rotulo);
-  Rotulo *pop();
+  void pop();
   Rotulo *busca_rotulo(const std::string &simb);
   Rotulo *busca_rotulo(int offset);
 

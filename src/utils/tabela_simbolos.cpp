@@ -18,6 +18,16 @@ t_node *criar_nodo(Simbolo *simbolo, t_node *prev) {
   return new_node;
 }
 
+TabelaSimbolos::~TabelaSimbolos() {
+  t_node *current = this->top;
+
+  while (current != nullptr) {
+    t_node *prev = current->prev;
+    delete current;
+    current = prev;
+  }
+}
+
 void TabelaSimbolos::push(Simbolo *simbolo) {
   t_node *novo_nodo = criar_nodo(simbolo, this->top);
 
@@ -157,22 +167,20 @@ Simbolo *TabelaSimbolos::buscaSimbolo(int top_offset){
   return nullptr;
 }
 
-Simbolo *TabelaSimbolos::pop() {
+void TabelaSimbolos::pop() {
   if (this->is_stack_empty()) {
-    return nullptr;
+    return;
   }
 
   t_node *top_node = this->top;
   Simbolo *simbolo = top_node->simbolo;
 
   this->top = top_node->prev;
-  free(top_node);
+  delete top_node;
 
   if (this->top == nullptr) {
     this->bottom = nullptr;
   }
-
-  return simbolo;
 }
 
 // Function to print a symbol

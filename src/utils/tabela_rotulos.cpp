@@ -32,15 +32,14 @@ Rotulo *TabelaRotulos::busca_rotulo(int top_offset) {
   return nullptr;
 }
 
-Rotulo *TabelaRotulos::pop() {
-  if (rotulos.empty()) {
-    return nullptr;
-  }
+void TabelaRotulos::pop() {
+  if (rotulos.empty())
+    return;
 
   Rotulo *rotulo = rotulos.back();
+  
   rotulos.pop_back();
-
-  return rotulo;
+  delete rotulo;
 }
 
 void TabelaRotulos::print_tabela() {

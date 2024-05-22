@@ -1,5 +1,12 @@
 program exemplo74 (input, output);
 var z, x: integer;
+   procedure p;
+   var y : integer;
+   begin
+      write(z)
+   end;
+
+
    procedure g(t:integer);
    var y : integer;
    begin
@@ -35,8 +42,11 @@ var z, x: integer;
       g(z+x)
    end;
 begin
+   p;
+   p();
+   cunf;
    cunf();
    g(x);
-   func(1);
-   x := func(func(func(1)));
+   func(cunf());
+   x := cunf();
 end.
