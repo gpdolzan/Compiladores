@@ -37,9 +37,9 @@ bison: $(SRCDIR)/bison.y
 # Phony target to clean the build directory
 .PHONY: clean
 clean:
-	rm -r $(BUILDDIR)
-	rm $(TARGET)
-	rm mepa.txt
+	-rm -r $(BUILDDIR)
+	-rm $(TARGET)
+	-rm mepa.txt
 
 # Phony target to run the program
 .PHONY: run

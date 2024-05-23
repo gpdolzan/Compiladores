@@ -53,7 +53,7 @@ void geraCodigo(const std::string &comando, const std::string &rot,
 }
 
 void iniciaCompilador() {
-  mepa_stream.open("mepa.txt", std::ofstream::out);
+  mepa_stream.open("MEPA", std::ofstream::out);
 
   tabela_simb = new TabelaSimbolos;
   tabela_rotulos = new TabelaRotulos;

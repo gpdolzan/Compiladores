@@ -63,7 +63,7 @@ void insereTiposSimples(TabelaTipos *tabela) {
 }
 
 void iniciaCompilador() {
-  compiled_stream.open("MEPA.txt");
+  compiled_stream.open("MEPA");
 
   tabela_simb = new TabelaSimbolos;
   tabela_rotulos = new TabelaRotulos;

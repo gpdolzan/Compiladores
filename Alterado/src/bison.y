@@ -447,8 +447,9 @@ atribuicao:
    ATRIBUICAO
    expressao
    {
-      if($1->allow_return)
-         error("Função não pode ser usada como variável");
+      if($1->is_func())
+         if(!$1->allow_return)
+            error("Função não pode ser usada como variável");
 
       if(*($1->tipo_v) != *($3.tipo_v))
          error("Tipos incompatíveis na atribuição");
