@@ -19,6 +19,7 @@ int top_desloc = 0;
 std::list<Param> *params;
 std::stack<std::list<Param>> expression_list_types = {};
 std::stack<std::stack<Param>> calling_proc_params = {};
+std::stack<int*> num_proc_declared = {};
 %}
 
 %require "3.7.4"
@@ -59,6 +60,7 @@ std::stack<std::stack<Param>> calling_proc_params = {};
 
 %type <int> parte_declara_vars
 %type <int> parte_declara_tipo
+%type <int> parte_declara_subrotinas_wrap
 
 %type <tipo_parametro> tipo_parametro
 %type <Tipo*> tipo
@@ -126,6 +128,8 @@ bloco:
    }
    parte_declara_subrotinas_wrap
    {
+      $1->number_procs = $6;
+
       if ($1->is_func())
          $1->allow_return = true;
    }
@@ -133,8 +137,7 @@ bloco:
    {
       Simbolo* proce = $1;
 
-      if(!proce->is_main())
-         removeSimbolos(proce->parametros->size() + proce->number_vars);
+      removeSimbolos(proce->parametros->size() + proce->number_vars + proce->number_procs);
 
       removeTipos($1->number_types);
       geraCodigo("DMEM", proce->number_vars);
@@ -252,14 +255,24 @@ parte_declara_subrotinas_wrap:
       Simbolo *proc = $<Simbolo*>0;
 
       geraCodigo("DSVS", "", proc->rotulo_begin()->identificador);
+
+      num_proc_declared.push(new int{0});
    }
    parte_declara_subrotinas
    {
       Simbolo *proc = $<Simbolo*>0;
 
       geraCodigo("NADA", proc->rotulo_begin()->identificador);
+
+      int *procs_declared = num_proc_declared.top();
+      num_proc_declared.pop();
+      $$ = *procs_declared;
+      delete procs_declared;
    }
    | %empty
+   {
+      $$ = 0;
+   }
 ;
 
 parte_declara_subrotinas:
@@ -271,11 +284,15 @@ parte_declara_subrotinas_two:
    declaracao_procedimento bloco PONTO_E_VIRGULA
    {
       lexic_level--;
+
+      ++*(num_proc_declared.top());
    }
    | declaracao_funcao
    bloco PONTO_E_VIRGULA
    {
       lexic_level--;
+
+      ++*(num_proc_declared.top());
    }
 ;
 

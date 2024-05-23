@@ -9,14 +9,20 @@ var b : banana;
       sorvetinho = integer;
    var ba: banana;
       la: laranja;
+      procedure asihdhajsdbhjads;
+         type sundei = banana;
+            sorvetinho = integer;
+         var ba: banana;
+            la: laranja;
+            begin 
+            end;
    begin
-      
    end;
    
    procedure fechoaria;
    type feijaoPreto = boolean;
       feijaoCarioca = boolean;
-   var ba: sorvetinho;
+   var ba: feijaoPreto;
       la: laranja;
    begin
       
@@ -27,7 +33,6 @@ begin
    b := 1;
    while b<=10 do
    begin
-      l:=b;     (* Deve acusar erro aqui *) 
       x:=x+1;
       write (x);
       b:=b+1

@@ -78,8 +78,8 @@ public:
 
   Simbolo(const std::string &identificador, int nivel_lexico,
           std::list<Param> *parametros, tipo_simbolo tipo_simbo)
-      : identificador{identificador}, tipo_simbo{tipo_simbo},
-        nivel_lexico{nivel_lexico}, parametros{parametros} {}
+      : identificador{identificador}, nivel_lexico{nivel_lexico},
+        parametros{parametros}, tipo_simbo{tipo_simbo} {}
 
   ~Simbolo() {
     if (parametros != nullptr)
@@ -112,6 +112,7 @@ public:
   tipo_simbolo tipo_simbo;
   int number_vars = 0;
   int allow_return = 0;
+  int number_procs = 0;
 
 protected:
   Rotulo *rotulo_entrada_proce = nullptr;

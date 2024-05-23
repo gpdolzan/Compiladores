@@ -61,7 +61,7 @@ typedef enum { t_copy, t_pointer } tipo_parametro;
 class Param {
 public:
   Param() = default;
-  Param(Tipo * tipo_v, tipo_parametro tipo_param)
+  Param(Tipo *tipo_v, tipo_parametro tipo_param)
       : tipo_v{tipo_v}, tipo_param{tipo_param} {}
 
   Tipo *tipo_v;
@@ -78,8 +78,8 @@ public:
 
   Simbolo(const std::string &identificador, int nivel_lexico,
           std::list<Param> *parametros, tipo_simbolo tipo_simbo)
-      : identificador{identificador}, tipo_simbo{tipo_simbo},
-        nivel_lexico{nivel_lexico}, parametros{parametros} {}
+      : identificador{identificador}, nivel_lexico{nivel_lexico},
+        parametros{parametros}, tipo_simbo{tipo_simbo} {}
 
   ~Simbolo() {
     if (parametros != nullptr)
@@ -113,6 +113,7 @@ public:
   int number_vars = 0;
   int number_types = 0;
   int allow_return = 0;
+  int number_procs = 0;
 
 protected:
   Rotulo *rotulo_entrada_proce = nullptr;

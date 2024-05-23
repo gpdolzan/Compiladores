@@ -39,7 +39,7 @@ bison: $(SRCDIR)/bison.y
 clean:
 	-rm -r $(BUILDDIR)
 	-rm $(TARGET)
-	-rm mepa.txt
+	-rm MEPA
 
 # Phony target to run the program
 .PHONY: run
