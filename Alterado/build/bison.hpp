@@ -45,7 +45,7 @@
 #ifndef YY_YY_BISON_HPP_INCLUDED
 # define YY_YY_BISON_HPP_INCLUDED
 // "%code requires" blocks.
-#line 33 "src/bison.y"
+#line 34 "src/bison.y"
 
   #include "../includes/utils/simbolos.hpp"
 
@@ -183,7 +183,7 @@
 # define YYDEBUG 0
 #endif
 
-#line 29 "src/bison.y"
+#line 30 "src/bison.y"
 namespace bison {
 #line 189 "bison.hpp"
 
@@ -391,28 +391,29 @@ namespace bison {
       // @2
       // bloco
       // @3
-      // @4
+      // @5
       // declaracao_procedimento
-      // @8
-      // declaracao_funcao
       // @9
+      // declaracao_funcao
+      // @10
       // chamada_sem_pametro
       // chamada_procedimento_parametros
       // chamada_funcao_sem_parametros
       // variavel
       char dummy2[sizeof (Simbolo*)];
 
+      // tipo
+      char dummy3[sizeof (Tipo*)];
+
+      // parte_declara_tipo
       // parte_declara_vars
-      char dummy3[sizeof (int)];
+      char dummy4[sizeof (int)];
 
       // ident
-      char dummy4[sizeof (std::string)];
+      char dummy5[sizeof (std::string)];
 
       // tipo_parametro
-      char dummy5[sizeof (tipo_parametro)];
-
-      // tipo
-      char dummy6[sizeof (tipo_variavel)];
+      char dummy6[sizeof (tipo_parametro)];
     };
 
     /// The size of the largest semantic type.
@@ -575,59 +576,63 @@ namespace bison {
         S_52_2 = 52,                             // @2
         S_bloco = 53,                            // bloco
         S_54_3 = 54,                             // @3
-        S_55_4 = 55,                             // @4
-        S_56_5 = 56,                             // $@5
-        S_parte_declara_vars = 57,               // parte_declara_vars
-        S_declara_vars = 58,                     // declara_vars
-        S_declara_var = 59,                      // declara_var
-        S_60_6 = 60,                             // $@6
-        S_lista_var = 61,                        // lista_var
-        S_ident = 62,                            // ident
-        S_lista_idents = 63,                     // lista_idents
-        S_parte_declara_subrotinas_wrap = 64,    // parte_declara_subrotinas_wrap
-        S_65_7 = 65,                             // $@7
-        S_parte_declara_subrotinas = 66,         // parte_declara_subrotinas
-        S_parte_declara_subrotinas_two = 67,     // parte_declara_subrotinas_two
-        S_declaracao_procedimento = 68,          // declaracao_procedimento
-        S_69_8 = 69,                             // @8
-        S_declaracao_funcao = 70,                // declaracao_funcao
-        S_71_9 = 71,                             // @9
-        S_declaracao_params = 72,                // declaracao_params
-        S_73_10 = 73,                            // $@10
-        S_parametros_formais = 74,               // parametros_formais
-        S_secao_parametros_formais = 75,         // secao_parametros_formais
-        S_76_11 = 76,                            // $@11
-        S_lista_params = 77,                     // lista_params
-        S_tipo_parametro = 78,                   // tipo_parametro
-        S_comando_composto = 79,                 // comando_composto
-        S_lista_comandos = 80,                   // lista_comandos
-        S_comando = 81,                          // comando
-        S_comando_sem_rotulo = 82,               // comando_sem_rotulo
-        S_lista_write = 83,                      // lista_write
-        S_lista_read = 84,                       // lista_read
-        S_atribuicao = 85,                       // atribuicao
-        S_chamada_procedimento = 86,             // chamada_procedimento
-        S_chamada_sem_pametro = 87,              // chamada_sem_pametro
-        S_chamada_procedimento_parametros = 88,  // chamada_procedimento_parametros
-        S_89_12 = 89,                            // $@12
-        S_chamada_funcao_sem_parametros = 90,    // chamada_funcao_sem_parametros
-        S_variavel = 91,                         // variavel
-        S_comando_condicional = 92,              // comando_condicional
-        S_if_then = 93,                          // if_then
-        S_94_13 = 94,                            // $@13
-        S_cond_else = 95,                        // cond_else
-        S_96_14 = 96,                            // $@14
-        S_comando_repetitivo = 97,               // comando_repetitivo
-        S_98_15 = 98,                            // $@15
-        S_99_16 = 99,                            // $@16
-        S_expressao_booleana = 100,              // expressao_booleana
-        S_lista_de_expressoes = 101,             // lista_de_expressoes
-        S_expressao = 102,                       // expressao
-        S_expressao_simples = 103,               // expressao_simples
-        S_termo = 104,                           // termo
-        S_fator = 105,                           // fator
-        S_variavel_func = 106,                   // variavel_func
-        S_tipo = 107                             // tipo
+        S_55_4 = 55,                             // $@4
+        S_56_5 = 56,                             // @5
+        S_57_6 = 57,                             // $@6
+        S_parte_declara_tipo = 58,               // parte_declara_tipo
+        S_define_tipos = 59,                     // define_tipos
+        S_define_tipo = 60,                      // define_tipo
+        S_parte_declara_vars = 61,               // parte_declara_vars
+        S_declara_vars = 62,                     // declara_vars
+        S_declara_var = 63,                      // declara_var
+        S_64_7 = 64,                             // $@7
+        S_lista_var = 65,                        // lista_var
+        S_ident = 66,                            // ident
+        S_lista_idents = 67,                     // lista_idents
+        S_parte_declara_subrotinas_wrap = 68,    // parte_declara_subrotinas_wrap
+        S_69_8 = 69,                             // $@8
+        S_parte_declara_subrotinas = 70,         // parte_declara_subrotinas
+        S_parte_declara_subrotinas_two = 71,     // parte_declara_subrotinas_two
+        S_declaracao_procedimento = 72,          // declaracao_procedimento
+        S_73_9 = 73,                             // @9
+        S_declaracao_funcao = 74,                // declaracao_funcao
+        S_75_10 = 75,                            // @10
+        S_declaracao_params = 76,                // declaracao_params
+        S_77_11 = 77,                            // $@11
+        S_parametros_formais = 78,               // parametros_formais
+        S_secao_parametros_formais = 79,         // secao_parametros_formais
+        S_80_12 = 80,                            // $@12
+        S_lista_params = 81,                     // lista_params
+        S_tipo_parametro = 82,                   // tipo_parametro
+        S_comando_composto = 83,                 // comando_composto
+        S_lista_comandos = 84,                   // lista_comandos
+        S_comando = 85,                          // comando
+        S_comando_sem_rotulo = 86,               // comando_sem_rotulo
+        S_lista_write = 87,                      // lista_write
+        S_lista_read = 88,                       // lista_read
+        S_atribuicao = 89,                       // atribuicao
+        S_chamada_procedimento = 90,             // chamada_procedimento
+        S_chamada_sem_pametro = 91,              // chamada_sem_pametro
+        S_chamada_procedimento_parametros = 92,  // chamada_procedimento_parametros
+        S_93_13 = 93,                            // $@13
+        S_chamada_funcao_sem_parametros = 94,    // chamada_funcao_sem_parametros
+        S_variavel = 95,                         // variavel
+        S_comando_condicional = 96,              // comando_condicional
+        S_if_then = 97,                          // if_then
+        S_98_14 = 98,                            // $@14
+        S_cond_else = 99,                        // cond_else
+        S_100_15 = 100,                          // $@15
+        S_comando_repetitivo = 101,              // comando_repetitivo
+        S_102_16 = 102,                          // $@16
+        S_103_17 = 103,                          // $@17
+        S_expressao_booleana = 104,              // expressao_booleana
+        S_lista_de_expressoes = 105,             // lista_de_expressoes
+        S_expressao = 106,                       // expressao
+        S_expressao_simples = 107,               // expressao_simples
+        S_termo = 108,                           // termo
+        S_fator = 109,                           // fator
+        S_variavel_func = 110,                   // variavel_func
+        S_tipo = 111                             // tipo
       };
     };
 
@@ -673,11 +678,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -685,6 +690,11 @@ namespace bison {
         value.move< Simbolo* > (std::move (that.value));
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.move< Tipo* > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.move< int > (std::move (that.value));
         break;
@@ -695,10 +705,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.move< tipo_parametro > (std::move (that.value));
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.move< tipo_variavel > (std::move (that.value));
         break;
 
       default:
@@ -747,6 +753,18 @@ namespace bison {
 #endif
 
 #if 201103L <= YY_CPLUSPLUS
+      basic_symbol (typename Base::kind_type t, Tipo*&& v)
+        : Base (t)
+        , value (std::move (v))
+      {}
+#else
+      basic_symbol (typename Base::kind_type t, const Tipo*& v)
+        : Base (t)
+        , value (v)
+      {}
+#endif
+
+#if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, int&& v)
         : Base (t)
         , value (std::move (v))
@@ -777,18 +795,6 @@ namespace bison {
       {}
 #else
       basic_symbol (typename Base::kind_type t, const tipo_parametro& v)
-        : Base (t)
-        , value (v)
-      {}
-#endif
-
-#if 201103L <= YY_CPLUSPLUS
-      basic_symbol (typename Base::kind_type t, tipo_variavel&& v)
-        : Base (t)
-        , value (std::move (v))
-      {}
-#else
-      basic_symbol (typename Base::kind_type t, const tipo_variavel& v)
         : Base (t)
         , value (v)
       {}
@@ -829,11 +835,11 @@ switch (yykind)
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -841,6 +847,11 @@ switch (yykind)
         value.template destroy< Simbolo* > ();
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.template destroy< Tipo* > ();
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.template destroy< int > ();
         break;
@@ -851,10 +862,6 @@ switch (yykind)
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.template destroy< tipo_parametro > ();
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.template destroy< tipo_variavel > ();
         break;
 
       default:
@@ -2042,8 +2049,8 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 160,     ///< Last index in yytable_.
-      yynnts_ = 59,  ///< Number of nonterminal symbols.
+      yylast_ = 174,     ///< Last index in yytable_.
+      yynnts_ = 63,  ///< Number of nonterminal symbols.
       yyfinal_ = 3 ///< Termination state number.
     };
 
@@ -2054,19 +2061,19 @@ switch (yykind)
   };
 
 
-#line 29 "src/bison.y"
+#line 30 "src/bison.y"
 } // bison
-#line 2060 "bison.hpp"
+#line 2067 "bison.hpp"
 
 
 // "%code provides" blocks.
-#line 38 "src/bison.y"
+#line 39 "src/bison.y"
 
     #define YY_DECL \
         int yylex(bison::Parser::semantic_type *yylval, yyscan_t yyscanner)
     YY_DECL;
 
-#line 2070 "bison.hpp"
+#line 2077 "bison.hpp"
 
 
 #endif // !YY_YY_BISON_HPP_INCLUDED

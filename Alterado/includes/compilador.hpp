@@ -13,6 +13,7 @@
 extern std::string simbolo_flex;
 extern Simbolo *simbolo_main;
 extern int nl, instruction_count;
+extern std::ofstream compiled_stream;
 
 /* -------------------------------------------------------------------
  * prototipos globais
@@ -35,7 +36,12 @@ Simbolo *buscaSimbolo(int top_offset);
 void removeSimbolos(int quant);
 void removeSimbolos();
 
-void colocaTipoEmSimbolos(tipo_variavel tipo, int quantidade);
+void insereTipo(std::string identificador, Tipo *tipo_pai);
+Tipo *buscaTipo(std::string identificador);
+Tipo *buscaTipoPrimitivo(tipo_simples_variavel tipo_primitivo);
+void removeTipos(int quantidade);
+
+void colocaTipoEmSimbolos(Tipo *tipo, int quantidade);
 void colocaTipoEmSimbolos(tipo_parametro_variavel tipo, int quantidade);
 void colocaTipoEmSimbolos(tipo_parametro tipo, int quantidade);
 void colocaDeslocEmParams(int quantidade);
@@ -56,5 +62,7 @@ void end_else();
 
 void entraProce(Simbolo *simb);
 
-void visualizaTabela();
+void visualizaTabelas();
+void visualizaTabelaSimbolos();
+void visualizaTabelaTipos();
 void error(const std::string &msg);

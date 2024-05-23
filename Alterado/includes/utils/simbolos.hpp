@@ -61,10 +61,10 @@ typedef enum { t_copy, t_pointer } tipo_parametro;
 class Param {
 public:
   Param() = default;
-  Param(tipo_simples_variavel tipo_v, tipo_parametro tipo_param)
+  Param(Tipo * tipo_v, tipo_parametro tipo_param)
       : tipo_v{tipo_v}, tipo_param{tipo_param} {}
 
-  tipo_simples_variavel tipo_v;
+  Tipo *tipo_v;
   tipo_parametro tipo_param;
 };
 
@@ -101,7 +101,7 @@ public:
   int is_proc_or_func();
 
   std::string identificador;
-  tipo_simples_variavel tipo_v;
+  Tipo *tipo_v;
   tipo_parametro_variavel tipo_param_var;
   tipo_parametro tipo_param;
 
@@ -111,6 +111,7 @@ public:
   std::list<Param> *parametros = nullptr;
   tipo_simbolo tipo_simbo;
   int number_vars = 0;
+  int number_types = 0;
   int allow_return = 0;
 
 protected:

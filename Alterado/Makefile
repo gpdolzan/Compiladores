@@ -44,7 +44,7 @@ clean:
 # Phony target to run the program
 .PHONY: run
 run: $(TARGET)
-	./$(TARGET) < tests/type1.pas
+	./$(TARGET) ./tests/type4.pas
 
 # Phony target to run the program
 .PHONY: valgrind

@@ -40,7 +40,7 @@ void TabelaSimbolos::push(Simbolo *simbolo) {
   }
 }
 
-void TabelaSimbolos::coloca_tipo_em_simbolos(tipo_simples_variavel tipo,
+void TabelaSimbolos::coloca_tipo_em_simbolos(Tipo *tipo,
                                              int quantidade) {
   if (this->is_stack_empty()) {
     std::cerr << "A tabela esta vazia\n";
@@ -186,8 +186,8 @@ void TabelaSimbolos::pop() {
 // Function to print a symbol
 void print_simbolo(Simbolo *s) {
   if (s != nullptr) {
-    printf("Simbolo: %s, Tipo: %d, Nivel Lexico: %d, Deslocamento: %d\n",
-           s->identificador.c_str(), s->tipo_v, s->nivel_lexico,
+    printf("Simbolo: %s, Tipo: %s, Nivel Lexico: %d, Deslocamento: %d\n",
+           s->identificador.c_str(), s->tipo_v->identificador.c_str(), s->nivel_lexico,
            s->deslocamento);
   } else {
     printf("Simbolo nullptr\n");
@@ -198,7 +198,7 @@ void TabelaSimbolos::print_var_simbolo(Simbolo *simbolo) {
   printf("│ %-11s │ %-12s │ %-12s │ %-13d │ %-18d │ %-13s │ %-14s │ %-14s │\n",
          simbolo->identificador.c_str(),
          "Variavel",
-         (simbolo->tipo_v == t_int ? "INT": "BOOL"),
+         simbolo->tipo_v->identificador.c_str(),
          simbolo->nivel_lexico,
          simbolo->deslocamento,
          (simbolo->tipo_param_var == variavel_simples ? "VS": "PF"),
@@ -210,7 +210,7 @@ void TabelaSimbolos::print_process_simbolo(Simbolo *simbolo) {
   printf("│ %-11s │ %-12s │ %-12s │ %-13d │ %-18s │ %-13s │ %-14s │ %-14s │\n",
          simbolo->identificador.c_str(),
          (simbolo->tipo_simbo == function ? "Funcao" : "Procedimento"),
-         (simbolo->tipo_simbo == function ? (simbolo->tipo_v == t_int ? "INT": "BOOL") : "N/A"),
+         (simbolo->tipo_simbo == function ? simbolo->identificador.c_str() : "N/A"),
          simbolo->nivel_lexico,
          (simbolo->tipo_simbo == function ? std::to_string(simbolo->deslocamento).c_str() : "N/A"),
          "N/A",  // Tipo Param Var não aplicável
@@ -270,7 +270,7 @@ void TabelaSimbolos::print_parametros(Simbolo *simbolo) {
   for (const auto& param : *simbolo->parametros) {
     printf("│ %-10d │ %-12s │ %-13s │\n",
            index,
-           param.tipo_v == t_undefined ? "Undefined" : (param.tipo_v == t_int ? "Inteiro" : "Booleano"),
+           param.tipo_v->identificador.c_str(),
            param.tipo_param == t_copy ? "Copia" : "Ponteiro");
     index++;
   }

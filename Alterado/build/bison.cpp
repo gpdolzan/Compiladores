@@ -52,13 +52,14 @@ int lexic_level = 0;
 int num_total_vars = 0;
 int num_total_params = 0;
 int num_same_type_vars = 0;
+int num_type_declared = 0;
 int top_desloc = 0;
 
 std::list<Param> *params;
 std::stack<std::list<Param>> expression_list_types = {};
 std::stack<std::stack<Param>> calling_proc_params = {};
 
-#line 62 "bison.cpp"
+#line 63 "bison.cpp"
 
 
 #include "bison.hpp"
@@ -135,9 +136,9 @@ std::stack<std::stack<Param>> calling_proc_params = {};
 #define YYERROR         goto yyerrorlab
 #define YYRECOVERING()  (!!yyerrstatus_)
 
-#line 29 "src/bison.y"
+#line 30 "src/bison.y"
 namespace bison {
-#line 141 "bison.cpp"
+#line 142 "bison.cpp"
 
   /// Build a parser object.
   Parser::Parser (yyscan_t scanner_yyarg)
@@ -179,11 +180,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -191,6 +192,11 @@ namespace bison {
         value.copy< Simbolo* > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.copy< Tipo* > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.copy< int > (YY_MOVE (that.value));
         break;
@@ -201,10 +207,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.copy< tipo_parametro > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.copy< tipo_variavel > (YY_MOVE (that.value));
         break;
 
       default:
@@ -249,11 +251,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -261,6 +263,11 @@ namespace bison {
         value.move< Simbolo* > (YY_MOVE (s.value));
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.move< Tipo* > (YY_MOVE (s.value));
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.move< int > (YY_MOVE (s.value));
         break;
@@ -271,10 +278,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.move< tipo_parametro > (YY_MOVE (s.value));
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.move< tipo_variavel > (YY_MOVE (s.value));
         break;
 
       default:
@@ -388,11 +391,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -400,6 +403,11 @@ namespace bison {
         value.YY_MOVE_OR_COPY< Simbolo* > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.YY_MOVE_OR_COPY< Tipo* > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.YY_MOVE_OR_COPY< int > (YY_MOVE (that.value));
         break;
@@ -410,10 +418,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.YY_MOVE_OR_COPY< tipo_parametro > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.YY_MOVE_OR_COPY< tipo_variavel > (YY_MOVE (that.value));
         break;
 
       default:
@@ -442,11 +446,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -454,6 +458,11 @@ namespace bison {
         value.move< Simbolo* > (YY_MOVE (that.value));
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.move< Tipo* > (YY_MOVE (that.value));
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.move< int > (YY_MOVE (that.value));
         break;
@@ -464,10 +473,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.move< tipo_parametro > (YY_MOVE (that.value));
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.move< tipo_variavel > (YY_MOVE (that.value));
         break;
 
       default:
@@ -496,11 +501,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -508,6 +513,11 @@ namespace bison {
         value.copy< Simbolo* > (that.value);
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.copy< Tipo* > (that.value);
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.copy< int > (that.value);
         break;
@@ -518,10 +528,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.copy< tipo_parametro > (that.value);
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.copy< tipo_variavel > (that.value);
         break;
 
       default:
@@ -548,11 +554,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -560,6 +566,11 @@ namespace bison {
         value.move< Simbolo* > (that.value);
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        value.move< Tipo* > (that.value);
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         value.move< int > (that.value);
         break;
@@ -570,10 +581,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         value.move< tipo_parametro > (that.value);
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        value.move< tipo_variavel > (that.value);
         break;
 
       default:
@@ -840,11 +847,11 @@ namespace bison {
       case symbol_kind::S_52_2: // @2
       case symbol_kind::S_bloco: // bloco
       case symbol_kind::S_54_3: // @3
-      case symbol_kind::S_55_4: // @4
+      case symbol_kind::S_56_5: // @5
       case symbol_kind::S_declaracao_procedimento: // declaracao_procedimento
-      case symbol_kind::S_69_8: // @8
+      case symbol_kind::S_73_9: // @9
       case symbol_kind::S_declaracao_funcao: // declaracao_funcao
-      case symbol_kind::S_71_9: // @9
+      case symbol_kind::S_75_10: // @10
       case symbol_kind::S_chamada_sem_pametro: // chamada_sem_pametro
       case symbol_kind::S_chamada_procedimento_parametros: // chamada_procedimento_parametros
       case symbol_kind::S_chamada_funcao_sem_parametros: // chamada_funcao_sem_parametros
@@ -852,6 +859,11 @@ namespace bison {
         yylhs.value.emplace< Simbolo* > ();
         break;
 
+      case symbol_kind::S_tipo: // tipo
+        yylhs.value.emplace< Tipo* > ();
+        break;
+
+      case symbol_kind::S_parte_declara_tipo: // parte_declara_tipo
       case symbol_kind::S_parte_declara_vars: // parte_declara_vars
         yylhs.value.emplace< int > ();
         break;
@@ -862,10 +874,6 @@ namespace bison {
 
       case symbol_kind::S_tipo_parametro: // tipo_parametro
         yylhs.value.emplace< tipo_parametro > ();
-        break;
-
-      case symbol_kind::S_tipo: // tipo
-        yylhs.value.emplace< tipo_variavel > ();
         break;
 
       default:
@@ -883,35 +891,35 @@ namespace bison {
           switch (yyn)
             {
   case 2: // $@1: %empty
-#line 83 "src/bison.y"
+#line 85 "src/bison.y"
    {
       iniciaCompilador();
       geraCodigo("INPP");
    }
-#line 892 "bison.cpp"
+#line 900 "bison.cpp"
     break;
 
   case 3: // @2: %empty
-#line 89 "src/bison.y"
+#line 91 "src/bison.y"
              {
       simbolo_main = new Simbolo("main", lexic_level, new std::list<Param>(), main_process);
 
       yylhs.value.as < Simbolo* > () = simbolo_main;
    }
-#line 902 "bison.cpp"
+#line 910 "bison.cpp"
     break;
 
   case 4: // programa: $@1 PROGRAM IDENT ABRE_PARENTESES lista_idents FECHA_PARENTESES PONTO_E_VIRGULA @2 bloco PONTO
-#line 95 "src/bison.y"
+#line 97 "src/bison.y"
    {
       geraCodigo("PARA");
       desligaCompilador();
    }
-#line 911 "bison.cpp"
+#line 919 "bison.cpp"
     break;
 
   case 5: // @3: %empty
-#line 102 "src/bison.y"
+#line 104 "src/bison.y"
              {
       Simbolo* proce = yystack_[0].value.as< Simbolo* > ();
       
@@ -925,156 +933,191 @@ namespace bison {
       top_desloc = 0;
       yylhs.value.as< Simbolo* > () = proce;
    }
-#line 929 "bison.cpp"
+#line 937 "bison.cpp"
     break;
 
-  case 6: // @4: %empty
-#line 116 "src/bison.y"
-             {
-      yystack_[1].value.as < Simbolo* > ()->number_vars = yystack_[0].value.as < int > ();
-
-      yylhs.value.as < Simbolo* > () = yystack_[1].value.as < Simbolo* > ();
+  case 6: // $@4: %empty
+#line 118 "src/bison.y"
+   {
+      yystack_[1].value.as < Simbolo* > ()->number_types = yystack_[0].value.as < int > ();
    }
-#line 939 "bison.cpp"
+#line 945 "bison.cpp"
     break;
 
-  case 7: // $@5: %empty
+  case 7: // @5: %empty
 #line 122 "src/bison.y"
-   {
-      if (yystack_[3].value.as < Simbolo* > ()->is_func())
-         yystack_[3].value.as < Simbolo* > ()->allow_return = true;
+             {
+      yystack_[3].value.as < Simbolo* > ()->number_vars = yystack_[0].value.as < int > ();
+
+      yylhs.value.as < Simbolo* > () = yystack_[3].value.as < Simbolo* > ();
    }
-#line 948 "bison.cpp"
+#line 955 "bison.cpp"
     break;
 
-  case 8: // bloco: @3 parte_declara_vars @4 parte_declara_subrotinas_wrap $@5 comando_composto
-#line 127 "src/bison.y"
+  case 8: // $@6: %empty
+#line 128 "src/bison.y"
    {
-      Simbolo* proce = yystack_[5].value.as < Simbolo* > ();
+      if (yystack_[5].value.as < Simbolo* > ()->is_func())
+         yystack_[5].value.as < Simbolo* > ()->allow_return = true;
+   }
+#line 964 "bison.cpp"
+    break;
+
+  case 9: // bloco: @3 parte_declara_tipo $@4 parte_declara_vars @5 parte_declara_subrotinas_wrap $@6 comando_composto
+#line 133 "src/bison.y"
+   {
+      Simbolo* proce = yystack_[7].value.as < Simbolo* > ();
 
       if(!proce->is_main())
          removeSimbolos(proce->parametros->size() + proce->number_vars);
 
+      removeTipos(yystack_[7].value.as < Simbolo* > ()->number_types);
       geraCodigo("DMEM", proce->number_vars);
-
-      visualizaTabela();
+      visualizaTabelas();
 
       if (proce->is_proc_or_func())
          geraCodigo("RTPR", proce->nivel_lexico, proce->parametros->size());
 
       if (proce->is_func())
-         yystack_[5].value.as < Simbolo* > ()->allow_return = false;
+         yystack_[7].value.as < Simbolo* > ()->allow_return = false;
    }
-#line 969 "bison.cpp"
+#line 985 "bison.cpp"
     break;
 
-  case 9: // parte_declara_vars: VAR declara_vars
-#line 148 "src/bison.y"
+  case 10: // parte_declara_tipo: TYPE define_tipos
+#line 153 "src/bison.y"
    {
-      geraCodigo("AMEM", num_total_vars);
-      yylhs.value.as < int > () = num_total_vars;
-      visualizaTabela();
+      yylhs.value.as < int > () = num_type_declared;
+      visualizaTabelaTipos();
    }
-#line 979 "bison.cpp"
+#line 994 "bison.cpp"
     break;
 
-  case 10: // parte_declara_vars: %empty
-#line 154 "src/bison.y"
+  case 11: // parte_declara_tipo: %empty
+#line 158 "src/bison.y"
    {
       yylhs.value.as < int > () = 0;
    }
-#line 987 "bison.cpp"
+#line 1002 "bison.cpp"
     break;
 
-  case 13: // $@6: %empty
-#line 166 "src/bison.y"
-   {
-      num_same_type_vars = 0;
-   }
-#line 995 "bison.cpp"
-    break;
-
-  case 14: // declara_var: $@6 lista_var DOIS_PONTOS tipo PONTO_E_VIRGULA
+  case 14: // define_tipo: ident IGUAL tipo PONTO_E_VIRGULA
 #line 170 "src/bison.y"
    {
-      colocaTipoEmSimbolos(yystack_[1].value.as< tipo_variavel > (), num_same_type_vars);
-      num_same_type_vars = 0;
+      insereTipo(yystack_[3].value.as < std::string > (), yystack_[1].value.as < Tipo* > ());
+      num_type_declared++;
    }
-#line 1004 "bison.cpp"
+#line 1011 "bison.cpp"
     break;
 
-  case 15: // lista_var: lista_var VIRGULA ident
-#line 178 "src/bison.y"
+  case 15: // parte_declara_vars: VAR declara_vars
+#line 179 "src/bison.y"
    {
-      insereSimbolo(new Simbolo(yystack_[0].value.as < std::string > (), lexic_level, top_desloc, variavel_simples));
-      top_desloc++;
-      num_total_vars++;
-      num_same_type_vars++;
+      geraCodigo("AMEM", num_total_vars);
+      yylhs.value.as < int > () = num_total_vars;
+      visualizaTabelaSimbolos();
    }
-#line 1015 "bison.cpp"
+#line 1021 "bison.cpp"
     break;
 
-  case 16: // lista_var: ident
+  case 16: // parte_declara_vars: %empty
 #line 185 "src/bison.y"
    {
+      yylhs.value.as < int > () = 0;
+   }
+#line 1029 "bison.cpp"
+    break;
+
+  case 19: // $@7: %empty
+#line 197 "src/bison.y"
+   {
+      num_same_type_vars = 0;
+   }
+#line 1037 "bison.cpp"
+    break;
+
+  case 20: // declara_var: $@7 lista_var DOIS_PONTOS tipo PONTO_E_VIRGULA
+#line 201 "src/bison.y"
+   {
+      colocaTipoEmSimbolos(yystack_[1].value.as < Tipo* > (), num_same_type_vars);
+      num_same_type_vars = 0;
+   }
+#line 1046 "bison.cpp"
+    break;
+
+  case 21: // lista_var: lista_var VIRGULA ident
+#line 209 "src/bison.y"
+   {
       insereSimbolo(new Simbolo(yystack_[0].value.as < std::string > (), lexic_level, top_desloc, variavel_simples));
       top_desloc++;
       num_total_vars++;
       num_same_type_vars++;
    }
-#line 1026 "bison.cpp"
+#line 1057 "bison.cpp"
     break;
 
-  case 17: // ident: IDENT
-#line 195 "src/bison.y"
+  case 22: // lista_var: ident
+#line 216 "src/bison.y"
+   {
+      insereSimbolo(new Simbolo(yystack_[0].value.as < std::string > (), lexic_level, top_desloc, variavel_simples));
+      top_desloc++;
+      num_total_vars++;
+      num_same_type_vars++;
+   }
+#line 1068 "bison.cpp"
+    break;
+
+  case 23: // ident: IDENT
+#line 226 "src/bison.y"
    {
       yylhs.value.as < std::string > () = simbolo_flex;
    }
-#line 1034 "bison.cpp"
+#line 1076 "bison.cpp"
     break;
 
-  case 20: // $@7: %empty
-#line 220 "src/bison.y"
+  case 26: // $@8: %empty
+#line 251 "src/bison.y"
    {
       Simbolo *proc = yystack_[0].value.as< Simbolo* > ();
 
       geraCodigo("DSVS", "", proc->rotulo_begin()->identificador);
    }
-#line 1044 "bison.cpp"
+#line 1086 "bison.cpp"
     break;
 
-  case 21: // parte_declara_subrotinas_wrap: $@7 parte_declara_subrotinas
-#line 226 "src/bison.y"
+  case 27: // parte_declara_subrotinas_wrap: $@8 parte_declara_subrotinas
+#line 257 "src/bison.y"
    {
       Simbolo *proc = yystack_[2].value.as< Simbolo* > ();
 
       geraCodigo("NADA", proc->rotulo_begin()->identificador);
    }
-#line 1054 "bison.cpp"
+#line 1096 "bison.cpp"
     break;
 
-  case 25: // parte_declara_subrotinas_two: declaracao_procedimento bloco PONTO_E_VIRGULA
-#line 241 "src/bison.y"
+  case 31: // parte_declara_subrotinas_two: declaracao_procedimento bloco PONTO_E_VIRGULA
+#line 272 "src/bison.y"
    {
       lexic_level--;
    }
-#line 1062 "bison.cpp"
+#line 1104 "bison.cpp"
     break;
 
-  case 26: // parte_declara_subrotinas_two: declaracao_funcao bloco PONTO_E_VIRGULA
-#line 246 "src/bison.y"
+  case 32: // parte_declara_subrotinas_two: declaracao_funcao bloco PONTO_E_VIRGULA
+#line 277 "src/bison.y"
    {
       lexic_level--;
    }
-#line 1070 "bison.cpp"
+#line 1112 "bison.cpp"
     break;
 
-  case 27: // @8: %empty
-#line 254 "src/bison.y"
+  case 33: // @9: %empty
+#line 285 "src/bison.y"
              {
       lexic_level++;
       num_total_vars = 0;
       num_total_params = 0;
+      num_type_declared = 0;
       
       params = new std::list<Param>();
       Simbolo *proce = new Simbolo(yystack_[0].value.as < std::string > (), lexic_level, params, process);
@@ -1082,19 +1125,19 @@ namespace bison {
 
       yylhs.value.as < Simbolo* > () = proce;
    }
-#line 1086 "bison.cpp"
+#line 1129 "bison.cpp"
     break;
 
-  case 28: // declaracao_procedimento: PROCEDURE ident @8 declaracao_params PONTO_E_VIRGULA
-#line 266 "src/bison.y"
+  case 34: // declaracao_procedimento: PROCEDURE ident @9 declaracao_params PONTO_E_VIRGULA
+#line 298 "src/bison.y"
    {
       yylhs.value.as < Simbolo* > () = yystack_[2].value.as < Simbolo* > ();
    }
-#line 1094 "bison.cpp"
+#line 1137 "bison.cpp"
     break;
 
-  case 29: // @9: %empty
-#line 274 "src/bison.y"
+  case 35: // @10: %empty
+#line 306 "src/bison.y"
              {
       lexic_level++;
       num_total_vars = 0;
@@ -1106,51 +1149,51 @@ namespace bison {
       
       yylhs.value.as < Simbolo* > () = proce;
    }
-#line 1110 "bison.cpp"
+#line 1153 "bison.cpp"
     break;
 
-  case 30: // declaracao_funcao: FUNCTION ident @9 declaracao_params DOIS_PONTOS tipo PONTO_E_VIRGULA
-#line 286 "src/bison.y"
+  case 36: // declaracao_funcao: FUNCTION ident @10 declaracao_params DOIS_PONTOS tipo PONTO_E_VIRGULA
+#line 318 "src/bison.y"
    {
       yylhs.value.as < Simbolo* > () = yystack_[4].value.as < Simbolo* > ();
       yystack_[4].value.as < Simbolo* > ()->tipo_param = t_copy;
       yystack_[4].value.as < Simbolo* > ()->deslocamento = -(4 + num_total_params);
-      yystack_[4].value.as < Simbolo* > ()->tipo_v = yystack_[1].value.as < tipo_variavel > ();
+      yystack_[4].value.as < Simbolo* > ()->tipo_v = yystack_[1].value.as < Tipo* > ();
    }
-#line 1121 "bison.cpp"
+#line 1164 "bison.cpp"
     break;
 
-  case 31: // $@10: %empty
-#line 296 "src/bison.y"
+  case 37: // $@11: %empty
+#line 328 "src/bison.y"
    {
       colocaDeslocEmParams(num_total_params);
       
       params = nullptr;
    }
-#line 1131 "bison.cpp"
+#line 1174 "bison.cpp"
     break;
 
-  case 33: // declaracao_params: %empty
-#line 303 "src/bison.y"
+  case 39: // declaracao_params: %empty
+#line 335 "src/bison.y"
    {
       params = nullptr;
    }
-#line 1139 "bison.cpp"
+#line 1182 "bison.cpp"
     break;
 
-  case 36: // $@11: %empty
-#line 316 "src/bison.y"
+  case 42: // $@12: %empty
+#line 348 "src/bison.y"
    {
       num_same_type_vars = 0;
    }
-#line 1147 "bison.cpp"
+#line 1190 "bison.cpp"
     break;
 
-  case 37: // secao_parametros_formais: $@11 tipo_parametro lista_params DOIS_PONTOS tipo
-#line 320 "src/bison.y"
+  case 43: // secao_parametros_formais: $@12 tipo_parametro lista_params DOIS_PONTOS tipo
+#line 352 "src/bison.y"
    {
-      tipo_variavel tipo_v = yystack_[0].value.as< tipo_variavel > ();
-      tipo_parametro tipo_param = yystack_[3].value.as< tipo_parametro > ();
+      Tipo *tipo_v = yystack_[0].value.as < Tipo* > ();
+      tipo_parametro tipo_param = yystack_[3].value.as < tipo_parametro > ();
 
       for(int i = 0;i < num_same_type_vars;i++) {
          params->push_back(Param(tipo_v, tipo_param));
@@ -1159,96 +1202,95 @@ namespace bison {
       colocaTipoEmSimbolos(tipo_v, num_same_type_vars);
       colocaTipoEmSimbolos(tipo_param, num_same_type_vars);
    }
-#line 1163 "bison.cpp"
+#line 1206 "bison.cpp"
     break;
 
-  case 38: // lista_params: lista_params VIRGULA ident
-#line 335 "src/bison.y"
+  case 44: // lista_params: lista_params VIRGULA ident
+#line 367 "src/bison.y"
    {
       insereSimbolo(new Simbolo(yystack_[0].value.as < std::string > (), lexic_level, 0, parametros_formais));
       num_total_params++;
       num_same_type_vars++;
    }
-#line 1173 "bison.cpp"
+#line 1216 "bison.cpp"
     break;
 
-  case 39: // lista_params: ident
-#line 341 "src/bison.y"
+  case 45: // lista_params: ident
+#line 373 "src/bison.y"
    {
       insereSimbolo(new Simbolo(yystack_[0].value.as < std::string > (), lexic_level, 0, parametros_formais));
       num_total_params++;
       num_same_type_vars++;
    }
-#line 1183 "bison.cpp"
+#line 1226 "bison.cpp"
     break;
 
-  case 40: // tipo_parametro: VAR
-#line 350 "src/bison.y"
+  case 46: // tipo_parametro: VAR
+#line 382 "src/bison.y"
    {
       yylhs.value.as < tipo_parametro > () = t_pointer;
    }
-#line 1191 "bison.cpp"
+#line 1234 "bison.cpp"
     break;
 
-  case 41: // tipo_parametro: %empty
-#line 354 "src/bison.y"
+  case 47: // tipo_parametro: %empty
+#line 386 "src/bison.y"
    {
       yylhs.value.as < tipo_parametro > () = t_copy;
    }
-#line 1199 "bison.cpp"
+#line 1242 "bison.cpp"
     break;
 
-  case 55: // lista_write: lista_write VIRGULA expressao
-#line 389 "src/bison.y"
+  case 61: // lista_write: lista_write VIRGULA expressao
+#line 421 "src/bison.y"
    {
       geraCodigo("IMPR");
    }
-#line 1207 "bison.cpp"
+#line 1250 "bison.cpp"
     break;
 
-  case 56: // lista_write: expressao
-#line 393 "src/bison.y"
+  case 62: // lista_write: expressao
+#line 425 "src/bison.y"
    {
       geraCodigo("IMPR");
    }
-#line 1215 "bison.cpp"
+#line 1258 "bison.cpp"
     break;
 
-  case 57: // lista_read: lista_read VIRGULA variavel
-#line 400 "src/bison.y"
-   {
-      geraCodigo("LEIT");
-      aplicarArmazena(yystack_[0].value.as < Simbolo* > ());
-   }
-#line 1224 "bison.cpp"
-    break;
-
-  case 58: // lista_read: variavel
-#line 405 "src/bison.y"
-   {
-      geraCodigo("LEIT");
-      aplicarArmazena(yystack_[0].value.as < Simbolo* > ());
-   }
-#line 1233 "bison.cpp"
-    break;
-
-  case 59: // atribuicao: variavel ATRIBUICAO expressao
-#line 417 "src/bison.y"
-   {
-      if(yystack_[2].value.as < Simbolo* > ()->is_func())
-         if(!yystack_[2].value.as < Simbolo* > ()->allow_return)
-            error("Função não pode ser usada como variável");
-      
-      if(yystack_[2].value.as < Simbolo* > ()->tipo_v == yystack_[0].value.as < Param > ().tipo_v)
-         aplicarArmazena(yystack_[2].value.as < Simbolo* > ());
-      else
-         error("Tipos incompatíveis na atribuição");
-   }
-#line 1248 "bison.cpp"
-    break;
-
-  case 60: // chamada_procedimento: chamada_sem_pametro
+  case 63: // lista_read: lista_read VIRGULA variavel
 #line 432 "src/bison.y"
+   {
+      geraCodigo("LEIT");
+      aplicarArmazena(yystack_[0].value.as < Simbolo* > ());
+   }
+#line 1267 "bison.cpp"
+    break;
+
+  case 64: // lista_read: variavel
+#line 437 "src/bison.y"
+   {
+      geraCodigo("LEIT");
+      aplicarArmazena(yystack_[0].value.as < Simbolo* > ());
+   }
+#line 1276 "bison.cpp"
+    break;
+
+  case 65: // atribuicao: variavel ATRIBUICAO expressao
+#line 449 "src/bison.y"
+   {
+      if(yystack_[2].value.as < Simbolo* > ()->allow_return)
+         error("Função não pode ser usada como variável");
+
+      if(*(yystack_[2].value.as < Simbolo* > ()->tipo_v) != *(yystack_[0].value.as < Param > ().tipo_v))
+         error("Tipos incompatíveis na atribuição");
+      
+      aplicarArmazena(yystack_[2].value.as < Simbolo* > ());
+   }
+#line 1290 "bison.cpp"
+    break;
+
+  case 66: // chamada_procedimento: chamada_sem_pametro
+#line 463 "src/bison.y"
    {
       if(!yystack_[0].value.as < Simbolo* > ()->is_proc_or_func())
          error("Chamada de procedimento inválida");
@@ -1260,36 +1302,36 @@ namespace bison {
       if(yystack_[0].value.as < Simbolo* > ()->is_func())
          geraCodigo("DMEM", 1);
    }
-#line 1264 "bison.cpp"
+#line 1306 "bison.cpp"
     break;
 
-  case 61: // chamada_procedimento: chamada_procedimento_parametros
-#line 444 "src/bison.y"
+  case 67: // chamada_procedimento: chamada_procedimento_parametros
+#line 475 "src/bison.y"
    {
       if(yystack_[0].value.as < Simbolo* > ()->is_func())
          geraCodigo("DMEM", 1);
    }
-#line 1273 "bison.cpp"
+#line 1315 "bison.cpp"
     break;
 
-  case 62: // chamada_sem_pametro: variavel
-#line 452 "src/bison.y"
+  case 68: // chamada_sem_pametro: variavel
+#line 483 "src/bison.y"
    {
       yylhs.value.as < Simbolo* > () = yystack_[0].value.as < Simbolo* > ();
    }
-#line 1281 "bison.cpp"
+#line 1323 "bison.cpp"
     break;
 
-  case 63: // chamada_sem_pametro: variavel ABRE_PARENTESES FECHA_PARENTESES
-#line 456 "src/bison.y"
+  case 69: // chamada_sem_pametro: variavel ABRE_PARENTESES FECHA_PARENTESES
+#line 487 "src/bison.y"
    {
       yylhs.value.as < Simbolo* > () = yystack_[2].value.as < Simbolo* > ();
    }
-#line 1289 "bison.cpp"
+#line 1331 "bison.cpp"
     break;
 
-  case 64: // $@12: %empty
-#line 463 "src/bison.y"
+  case 70: // $@13: %empty
+#line 494 "src/bison.y"
    {
       Simbolo *proc = yystack_[1].value.as < Simbolo* > ();
 
@@ -1306,11 +1348,11 @@ namespace bison {
          calling_proc_params.top().push(*it);
       }
    }
-#line 1310 "bison.cpp"
+#line 1352 "bison.cpp"
     break;
 
-  case 65: // chamada_procedimento_parametros: variavel ABRE_PARENTESES $@12 lista_de_expressoes FECHA_PARENTESES
-#line 480 "src/bison.y"
+  case 71: // chamada_procedimento_parametros: variavel ABRE_PARENTESES $@13 lista_de_expressoes FECHA_PARENTESES
+#line 511 "src/bison.y"
    {
       Simbolo *proc = yystack_[4].value.as < Simbolo* > ();
       if(proc->parametros->size() != expression_list_types.top().size())
@@ -1328,11 +1370,11 @@ namespace bison {
 
       yylhs.value.as < Simbolo* > () = yystack_[4].value.as < Simbolo* > ();
    }
-#line 1332 "bison.cpp"
+#line 1374 "bison.cpp"
     break;
 
-  case 66: // chamada_funcao_sem_parametros: variavel ABRE_PARENTESES FECHA_PARENTESES
-#line 501 "src/bison.y"
+  case 72: // chamada_funcao_sem_parametros: variavel ABRE_PARENTESES FECHA_PARENTESES
+#line 532 "src/bison.y"
    {
       Simbolo *proc = yystack_[2].value.as < Simbolo* > ();
 
@@ -1344,262 +1386,262 @@ namespace bison {
       
       yylhs.value.as < Simbolo* > () = yystack_[2].value.as < Simbolo* > ();
    }
-#line 1348 "bison.cpp"
+#line 1390 "bison.cpp"
     break;
 
-  case 67: // variavel: IDENT
-#line 516 "src/bison.y"
+  case 73: // variavel: IDENT
+#line 547 "src/bison.y"
    {
       Simbolo* simbolo = buscaSimbolo(simbolo_flex);
       yylhs.value.as < Simbolo* > () = simbolo;
    }
-#line 1357 "bison.cpp"
+#line 1399 "bison.cpp"
     break;
 
-  case 69: // $@13: %empty
-#line 529 "src/bison.y"
+  case 75: // $@14: %empty
+#line 560 "src/bison.y"
    {
       start_if();
    }
-#line 1365 "bison.cpp"
+#line 1407 "bison.cpp"
     break;
 
-  case 71: // $@14: %empty
-#line 537 "src/bison.y"
+  case 77: // $@15: %empty
+#line 568 "src/bison.y"
    {
       start_else();
    }
-#line 1373 "bison.cpp"
+#line 1415 "bison.cpp"
     break;
 
-  case 72: // cond_else: ELSE $@14 comando_sem_rotulo
-#line 541 "src/bison.y"
+  case 78: // cond_else: ELSE $@15 comando_sem_rotulo
+#line 572 "src/bison.y"
    {
       end_else();
    }
-#line 1381 "bison.cpp"
+#line 1423 "bison.cpp"
     break;
 
-  case 73: // cond_else: %empty
-#line 545 "src/bison.y"
+  case 79: // cond_else: %empty
+#line 576 "src/bison.y"
    {
       end_if();
    }
-#line 1389 "bison.cpp"
+#line 1431 "bison.cpp"
     break;
 
-  case 74: // $@15: %empty
-#line 553 "src/bison.y"
+  case 80: // $@16: %empty
+#line 584 "src/bison.y"
    {
       start_while();
    }
-#line 1397 "bison.cpp"
+#line 1439 "bison.cpp"
     break;
 
-  case 75: // $@16: %empty
-#line 557 "src/bison.y"
+  case 81: // $@17: %empty
+#line 588 "src/bison.y"
    {
       do_while();
    }
-#line 1405 "bison.cpp"
+#line 1447 "bison.cpp"
     break;
 
-  case 76: // comando_repetitivo: WHILE $@15 expressao_booleana DO $@16 comando_sem_rotulo
-#line 561 "src/bison.y"
+  case 82: // comando_repetitivo: WHILE $@16 expressao_booleana DO $@17 comando_sem_rotulo
+#line 592 "src/bison.y"
    {
       end_while();
    }
-#line 1413 "bison.cpp"
+#line 1455 "bison.cpp"
     break;
 
-  case 77: // expressao_booleana: expressao
-#line 568 "src/bison.y"
+  case 83: // expressao_booleana: expressao
+#line 599 "src/bison.y"
    {
-      if(yystack_[0].value.as < Param > ().tipo_v != t_bool)
+      if(yystack_[0].value.as < Param > ().tipo_v->primitive_type != t_bool)
          error("Expressão booleana inválida");
    }
-#line 1422 "bison.cpp"
+#line 1464 "bison.cpp"
     break;
 
-  case 78: // lista_de_expressoes: lista_de_expressoes VIRGULA expressao
-#line 577 "src/bison.y"
+  case 84: // lista_de_expressoes: lista_de_expressoes VIRGULA expressao
+#line 608 "src/bison.y"
    {
       expression_list_types.top().push_back(yystack_[0].value.as < Param > ());
       if(calling_proc_params.top().empty())
          error("Número de parâmetros inválido");
       calling_proc_params.top().pop();
    }
-#line 1433 "bison.cpp"
+#line 1475 "bison.cpp"
     break;
 
-  case 79: // lista_de_expressoes: expressao
-#line 584 "src/bison.y"
+  case 85: // lista_de_expressoes: expressao
+#line 615 "src/bison.y"
    {
       expression_list_types.top().push_back(yystack_[0].value.as < Param > ());
       if(calling_proc_params.top().empty())
          error("Número de parâmetros inválido");
       calling_proc_params.top().pop();
    }
-#line 1444 "bison.cpp"
+#line 1486 "bison.cpp"
     break;
 
-  case 80: // expressao: expressao_simples MENOR_QUE expressao_simples
-#line 595 "src/bison.y"
+  case 86: // expressao: expressao_simples MENOR_QUE expressao_simples
+#line 626 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CMME", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1452 "bison.cpp"
+#line 1494 "bison.cpp"
     break;
 
-  case 81: // expressao: expressao_simples MAIOR_QUE expressao_simples
-#line 599 "src/bison.y"
+  case 87: // expressao: expressao_simples MAIOR_QUE expressao_simples
+#line 630 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CMMA", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1460 "bison.cpp"
+#line 1502 "bison.cpp"
     break;
 
-  case 82: // expressao: expressao_simples IGUAL expressao_simples
-#line 603 "src/bison.y"
+  case 88: // expressao: expressao_simples IGUAL expressao_simples
+#line 634 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CMIG", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1468 "bison.cpp"
+#line 1510 "bison.cpp"
     break;
 
-  case 83: // expressao: expressao_simples DIFERENTE expressao_simples
-#line 607 "src/bison.y"
+  case 89: // expressao: expressao_simples DIFERENTE expressao_simples
+#line 638 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CMDG", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1476 "bison.cpp"
+#line 1518 "bison.cpp"
     break;
 
-  case 84: // expressao: expressao_simples MAIOR_OU_IGUAL expressao_simples
-#line 611 "src/bison.y"
+  case 90: // expressao: expressao_simples MAIOR_OU_IGUAL expressao_simples
+#line 642 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CMAG", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1484 "bison.cpp"
+#line 1526 "bison.cpp"
     break;
 
-  case 85: // expressao: expressao_simples MENOR_OU_IGUAL expressao_simples
-#line 615 "src/bison.y"
+  case 91: // expressao: expressao_simples MENOR_OU_IGUAL expressao_simples
+#line 646 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CMEG", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1492 "bison.cpp"
+#line 1534 "bison.cpp"
     break;
 
-  case 86: // expressao: expressao_simples
-#line 618 "src/bison.y"
+  case 92: // expressao: expressao_simples
+#line 649 "src/bison.y"
      { yylhs.value.as < Param > () = yystack_[0].value.as < Param > (); }
-#line 1498 "bison.cpp"
+#line 1540 "bison.cpp"
     break;
 
-  case 87: // expressao_simples: expressao_simples MAIS termo
-#line 624 "src/bison.y"
+  case 93: // expressao_simples: expressao_simples MAIS termo
+#line 655 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("SOMA", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1506 "bison.cpp"
+#line 1548 "bison.cpp"
     break;
 
-  case 88: // expressao_simples: expressao_simples MENOS termo
-#line 628 "src/bison.y"
+  case 94: // expressao_simples: expressao_simples MENOS termo
+#line 659 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("SUBT", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1514 "bison.cpp"
+#line 1556 "bison.cpp"
     break;
 
-  case 89: // expressao_simples: expressao_simples OR termo
-#line 632 "src/bison.y"
+  case 95: // expressao_simples: expressao_simples OR termo
+#line 663 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("DISJ", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1522 "bison.cpp"
+#line 1564 "bison.cpp"
     break;
 
-  case 90: // expressao_simples: termo
-#line 635 "src/bison.y"
+  case 96: // expressao_simples: termo
+#line 666 "src/bison.y"
      { yylhs.value.as < Param > () = yystack_[0].value.as < Param > (); }
-#line 1528 "bison.cpp"
+#line 1570 "bison.cpp"
     break;
 
-  case 91: // termo: termo MULTI fator
-#line 641 "src/bison.y"
+  case 97: // termo: termo MULTI fator
+#line 672 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("MULT", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1536 "bison.cpp"
+#line 1578 "bison.cpp"
     break;
 
-  case 92: // termo: termo DIV fator
-#line 645 "src/bison.y"
+  case 98: // termo: termo DIV fator
+#line 676 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("DIVI", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1544 "bison.cpp"
+#line 1586 "bison.cpp"
     break;
 
-  case 93: // termo: termo AND fator
-#line 649 "src/bison.y"
+  case 99: // termo: termo AND fator
+#line 680 "src/bison.y"
    {
       yylhs.value.as < Param > () = aplicarOperacao("CONJ", yystack_[2].value.as < Param > (), yystack_[0].value.as < Param > ());
    }
-#line 1552 "bison.cpp"
+#line 1594 "bison.cpp"
     break;
 
-  case 94: // termo: fator
-#line 652 "src/bison.y"
+  case 100: // termo: fator
+#line 683 "src/bison.y"
      { yylhs.value.as < Param > () = yystack_[0].value.as < Param > (); }
-#line 1558 "bison.cpp"
+#line 1600 "bison.cpp"
     break;
 
-  case 95: // fator: NUMERO
-#line 658 "src/bison.y"
+  case 101: // fator: NUMERO
+#line 689 "src/bison.y"
    {
       geraCodigo("CRCT", "", simbolo_flex);
-      yylhs.value.as < Param > () = Param(t_int, t_copy);
+      yylhs.value.as < Param > () = Param(buscaTipoPrimitivo(t_int), t_copy);
    }
-#line 1567 "bison.cpp"
+#line 1609 "bison.cpp"
     break;
 
-  case 96: // fator: TRUE
-#line 663 "src/bison.y"
+  case 102: // fator: TRUE
+#line 694 "src/bison.y"
    {
       geraCodigo("CRCT", 1);
-      yylhs.value.as < Param > () = Param(t_bool, t_copy);
+      yylhs.value.as < Param > () = Param(buscaTipoPrimitivo(t_bool), t_copy);
    }
-#line 1576 "bison.cpp"
+#line 1618 "bison.cpp"
     break;
 
-  case 97: // fator: FALSE
-#line 668 "src/bison.y"
+  case 103: // fator: FALSE
+#line 699 "src/bison.y"
    {
       geraCodigo("CRCT", 0);
-      yylhs.value.as < Param > () = Param(t_bool, t_copy);
+      yylhs.value.as < Param > () = Param(buscaTipoPrimitivo(t_bool), t_copy);
    }
-#line 1585 "bison.cpp"
+#line 1627 "bison.cpp"
     break;
 
-  case 98: // fator: ABRE_PARENTESES expressao FECHA_PARENTESES
-#line 673 "src/bison.y"
+  case 104: // fator: ABRE_PARENTESES expressao FECHA_PARENTESES
+#line 704 "src/bison.y"
    {
       yylhs.value.as < Param > () = yystack_[1].value.as < Param > ();
    }
-#line 1593 "bison.cpp"
+#line 1635 "bison.cpp"
     break;
 
-  case 99: // fator: variavel_func
-#line 676 "src/bison.y"
+  case 105: // fator: variavel_func
+#line 707 "src/bison.y"
      { yylhs.value.as < Param > () = yystack_[0].value.as < Param > (); }
-#line 1599 "bison.cpp"
+#line 1641 "bison.cpp"
     break;
 
-  case 100: // variavel_func: variavel
-#line 682 "src/bison.y"
+  case 106: // variavel_func: variavel
+#line 713 "src/bison.y"
    {
       Simbolo* simbolo = yystack_[0].value.as < Simbolo* > ();
       
@@ -1619,11 +1661,11 @@ namespace bison {
       
       yylhs.value.as < Param > () = Param(simbolo->tipo_v, simbolo->tipo_param);
    }
-#line 1623 "bison.cpp"
+#line 1665 "bison.cpp"
     break;
 
-  case 101: // variavel_func: chamada_procedimento_parametros
-#line 702 "src/bison.y"
+  case 107: // variavel_func: chamada_procedimento_parametros
+#line 733 "src/bison.y"
    {
       Simbolo* proc = yystack_[0].value.as < Simbolo* > ();
       if(!proc->is_func())
@@ -1631,11 +1673,11 @@ namespace bison {
 
       yylhs.value.as < Param > () = Param(proc->tipo_v, proc->tipo_param);
    }
-#line 1635 "bison.cpp"
+#line 1677 "bison.cpp"
     break;
 
-  case 102: // variavel_func: chamada_funcao_sem_parametros
-#line 710 "src/bison.y"
+  case 108: // variavel_func: chamada_funcao_sem_parametros
+#line 741 "src/bison.y"
    {
       Simbolo* proc = yystack_[0].value.as < Simbolo* > ();
       if(!proc->is_func())
@@ -1643,26 +1685,19 @@ namespace bison {
 
       yylhs.value.as < Param > () = Param(proc->tipo_v, proc->tipo_param);
    }
-#line 1647 "bison.cpp"
+#line 1689 "bison.cpp"
     break;
 
-  case 103: // tipo: IDENT
-#line 721 "src/bison.y"
+  case 109: // tipo: ident
+#line 752 "src/bison.y"
    {
-      if (simbolo_flex == "boolean")
-         yylhs.value.as < tipo_variavel > () = t_bool;
-      else if (simbolo_flex == "integer")
-         yylhs.value.as < tipo_variavel > () = t_int;
-      else {
-         yylhs.value.as < tipo_variavel > () = t_undefined;
-         error("Tipo inválido");
-      }
+      yylhs.value.as < Tipo* > () = buscaTipo(yystack_[0].value.as < std::string > ());
    }
-#line 1662 "bison.cpp"
+#line 1697 "bison.cpp"
     break;
 
 
-#line 1666 "bison.cpp"
+#line 1701 "bison.cpp"
 
             default:
               break;
@@ -1851,175 +1886,182 @@ namespace bison {
 
 
 
-  const signed char Parser::yypact_ninf_ = -119;
+  const signed char Parser::yypact_ninf_ = -98;
 
-  const signed char Parser::yytable_ninf_ = -23;
+  const signed char Parser::yytable_ninf_ = -29;
 
   const signed char
   Parser::yypact_[] =
   {
-    -119,    17,    10,  -119,   -28,    41,    -8,  -119,  -119,   -18,
-      -8,    16,  -119,  -119,  -119,    62,    76,  -119,  -119,  -119,
-      47,  -119,    -8,    92,  -119,    26,  -119,  -119,    60,    56,
-      -8,   100,    -8,    -8,    60,  -119,  -119,  -119,  -119,    79,
-    -119,    11,  -119,  -119,  -119,  -119,    80,    81,  -119,    28,
-    -119,    78,    82,    83,  -119,  -119,     1,  -119,  -119,  -119,
-    -119,  -119,  -119,   -16,  -119,    96,  -119,    84,    84,  -119,
-    -119,  -119,  -119,    28,  -119,  -119,  -119,    85,  -119,  -119,
-      24,   -15,  -119,  -119,    28,    67,    28,    13,  -119,    11,
-      28,    87,  -119,  -119,  -119,    93,    94,    89,    91,    97,
-      28,    28,    28,    28,    28,    28,    28,    28,    28,    28,
-      28,    28,   107,     8,  -119,    12,  -119,  -119,  -119,  -119,
-    -119,    28,    13,    98,  -119,   122,  -119,    56,  -119,  -119,
-      13,   -15,   -12,   -12,   -12,   -12,   -12,   -12,   -15,   -15,
-    -119,  -119,  -119,  -119,    67,  -119,    28,  -119,    64,  -119,
-    -119,  -119,    95,  -119,    -8,   101,  -119,    13,  -119,  -119,
-      28,  -119,  -119,  -119,  -119,    50,  -119,  -119,  -119,    56,
-      -8,  -119,  -119
+     -98,    39,     6,   -98,   -36,    21,    35,   -98,   -98,   -24,
+      35,    30,   -98,   -98,   -98,    73,    63,   -98,    35,   -98,
+     -98,    35,    67,   102,   -98,    35,   -98,   -98,   -98,    80,
+      61,   -98,    35,   104,   -98,   -98,    66,   -98,   -98,    19,
+      35,    35,   105,    35,    35,    19,   -98,   -98,   -98,    84,
+     -98,     9,   -98,   -98,   -98,   -98,    85,    86,   -98,    50,
+     -98,    83,    89,    87,   -98,   -98,     1,   -98,   -98,   -98,
+     -98,   -98,   -98,    10,   -98,   103,   -98,    90,    90,   -98,
+     -98,   -98,   -98,    50,   -98,   -98,   -98,    91,   -98,   -98,
+      22,    -2,   -98,   -98,    50,    69,    50,    11,   -98,     9,
+      50,    92,   -98,   -98,   -98,    96,    97,    94,    95,   113,
+      50,    50,    50,    50,    50,    50,    50,    50,    50,    50,
+      50,    50,   112,    15,   -98,    40,   -98,   -98,   -98,   -98,
+     -98,    50,    11,   106,   -98,   126,   -98,    35,   -98,   -98,
+      11,    -2,    24,    24,    24,    24,    24,    24,    -2,    -2,
+     -98,   -98,   -98,   -98,    69,   -98,    50,   -98,    41,   -98,
+     -98,   -98,    99,   -98,    35,   107,   -98,    11,   -98,   -98,
+      50,   -98,   -98,   -98,   -98,    71,   -98,   -98,   -98,    35,
+      35,   -98,   -98
   };
 
   const signed char
   Parser::yydefact_[] =
   {
-       2,     0,     0,     1,     0,     0,     0,    17,    19,     0,
-       0,     0,    18,     3,     5,     0,    10,     4,    13,     6,
-       9,    12,     0,    20,    11,     0,    16,     7,     0,     0,
-       0,     0,     0,     0,    21,    24,     5,     5,   103,     0,
-      15,    47,     8,    27,    29,    23,     0,     0,    14,     0,
-      74,     0,     0,     0,    67,    50,     0,    44,    46,    48,
-      49,    60,    61,    62,    52,    73,    51,    33,    33,    25,
-      26,    96,    97,     0,    95,   101,   102,   100,    69,    77,
-      86,    90,    94,    99,     0,     0,     0,     0,    42,    47,
-       0,    64,    71,    68,    36,     0,     0,     0,    64,     0,
+       2,     0,     0,     1,     0,     0,     0,    23,    25,     0,
+       0,     0,    24,     3,     5,     0,    11,     4,     0,     6,
+      10,    13,     0,    16,    12,     0,    19,     7,   109,     0,
+      15,    18,     0,    26,    14,    17,     0,    22,     8,     0,
+       0,     0,     0,     0,     0,    27,    30,     5,     5,     0,
+      21,    53,     9,    33,    35,    29,     0,     0,    20,     0,
+      80,     0,     0,     0,    73,    56,     0,    50,    52,    54,
+      55,    66,    67,    68,    58,    79,    57,    39,    39,    31,
+      32,   102,   103,     0,   101,   107,   108,   106,    75,    83,
+      92,    96,   100,   105,     0,     0,     0,     0,    48,    53,
+       0,    70,    77,    74,    42,     0,     0,     0,    70,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    58,     0,    56,    45,    43,    59,
-      63,     0,     0,    31,    35,    41,    28,     0,    98,    66,
-       0,    89,    82,    83,    80,    85,    84,    81,    87,    88,
-      92,    93,    91,    75,     0,    54,     0,    53,     0,    79,
-      72,    36,     0,    40,     0,     0,    70,     0,    57,    55,
-       0,    65,    34,    32,    39,     0,    30,    76,    78,     0,
-       0,    37,    38
+       0,     0,     0,     0,    64,     0,    62,    51,    49,    65,
+      69,     0,     0,    37,    41,    47,    34,     0,   104,    72,
+       0,    95,    88,    89,    86,    91,    90,    87,    93,    94,
+      98,    99,    97,    81,     0,    60,     0,    59,     0,    85,
+      78,    42,     0,    46,     0,     0,    76,     0,    63,    61,
+       0,    71,    40,    38,    45,     0,    36,    82,    84,     0,
+       0,    43,    44
   };
 
   const signed char
   Parser::yypgoto_[] =
   {
-    -119,  -119,  -119,  -119,    65,  -119,  -119,  -119,  -119,  -119,
-     109,  -119,  -119,   -10,  -119,  -119,  -119,  -119,    99,  -119,
-    -119,  -119,  -119,    63,  -119,  -119,   -21,  -119,  -119,  -119,
-     103,  -119,    43,   -84,  -119,  -119,  -119,  -119,  -119,   -39,
-    -119,  -119,   -40,  -119,  -119,  -119,  -119,  -119,  -119,  -119,
-    -119,    51,  -119,   -65,   -17,   -31,   -11,  -119,  -118
+     -98,   -98,   -98,   -98,    54,   -98,   -98,   -98,   -98,   -98,
+     -98,   111,   -98,   -98,   108,   -98,   -98,    -6,   -98,   -98,
+     -98,   -98,    98,   -98,   -98,   -98,   -98,    57,   -98,   -98,
+     -25,   -98,   -98,   -98,   100,   -98,    38,   -87,   -98,   -98,
+     -98,   -98,   -98,   -48,   -98,   -98,   -49,   -98,   -98,   -98,
+     -98,   -98,   -98,   -98,   -98,    45,   -98,   -77,   -26,   -97,
+     -43,   -98,   -39
   };
 
   const unsigned char
   Parser::yydefgoto_[] =
   {
-       0,     1,     2,    14,    15,    16,    23,    31,    19,    20,
-      21,    22,    25,     8,     9,    27,    28,    34,    35,    36,
-      67,    37,    68,    95,   152,   123,   124,   125,   165,   154,
-      55,    56,    57,    58,   115,   113,    59,    60,    61,    75,
-     121,    76,    77,    64,    65,    99,    93,   122,    66,    84,
-     157,    78,   148,    79,    80,    81,    82,    83,    39
+       0,     1,     2,    14,    15,    16,    23,    33,    42,    19,
+      20,    21,    27,    30,    31,    32,    36,    28,     9,    38,
+      39,    45,    46,    47,    77,    48,    78,   105,   162,   133,
+     134,   135,   175,   164,    65,    66,    67,    68,   125,   123,
+      69,    70,    71,    85,   131,    86,    87,    74,    75,   109,
+     103,   132,    76,    94,   167,    88,   158,    89,    90,    91,
+      92,    93,    29
   };
 
   const short
   Parser::yytable_[] =
   {
-      12,    63,    62,   117,   109,   110,   100,    88,    97,   155,
-      90,    10,    26,     4,    11,    91,    41,     3,    41,     5,
-      40,   116,    43,    44,    49,   119,    49,    50,    89,    50,
-     111,   107,   108,    51,    52,    51,    52,   144,   150,     7,
-     145,   146,   100,    13,   147,   114,   156,    63,    62,    63,
-      62,   171,    71,    72,    29,    30,   149,    53,    54,    73,
-      54,   101,   102,   103,   104,   105,   106,   107,   108,   131,
-      32,    33,     6,   167,    74,    54,   138,   139,   169,   170,
-      18,   159,    63,    62,   132,   133,   134,   135,   136,   137,
-      63,    62,    17,   160,   -13,   168,   161,   -22,   140,   141,
-     142,    46,    47,    38,   158,    41,    48,    69,    70,    85,
-      92,    87,   130,    86,    54,    94,    98,    63,    62,   120,
-     126,   128,   127,   129,   143,   151,   153,   163,   166,    24,
-     162,    96,   118,    45,    42,   112,     0,     0,     0,     0,
-       0,     0,     0,     0,   164,     0,     0,     0,     0,     0,
+       8,    49,    73,    72,    12,    10,   107,    98,    11,     4,
+     127,     5,    22,   141,    51,    22,    51,   119,   120,   126,
+     148,   149,    59,   129,    59,    60,    37,    60,    99,    43,
+      44,    61,    62,    61,    62,    50,   100,    53,    54,     3,
+     110,   101,   110,   121,   154,   160,   124,   155,    73,    72,
+      73,    72,     6,   166,   159,    63,    64,    13,    64,   111,
+     112,   113,   114,   115,   116,   117,   118,   117,   118,   156,
+     170,    18,   157,   171,    81,    82,   150,   151,   152,   169,
+     177,    83,     7,    73,    72,   142,   143,   144,   145,   146,
+     147,    73,    72,   178,    40,    41,    84,    64,   165,   179,
+     180,    56,    57,    17,    25,   168,    26,    34,   -19,   -28,
+      51,    58,    79,    80,    95,    97,    64,   102,    73,    72,
+      96,   104,   108,   136,   130,   137,   138,   139,   140,   153,
+     163,   173,    24,   161,   176,   106,   172,   128,    35,   122,
+     181,     0,    52,    55,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   174,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-     172
+       0,     0,     0,     0,   182
   };
 
   const short
   Parser::yycheck_[] =
   {
-      10,    41,    41,    87,    19,    20,    18,     6,    73,   127,
-      26,    29,    22,     3,    32,    31,     5,     0,     5,    47,
-      30,    86,    32,    33,    13,    90,    13,    16,    27,    16,
-      45,    43,    44,    22,    23,    22,    23,    29,   122,    47,
-      32,    29,    18,    27,    32,    85,   130,    87,    87,    89,
-      89,   169,    24,    25,    28,    29,   121,    46,    47,    31,
-      47,    37,    38,    39,    40,    41,    42,    43,    44,   100,
-      10,    11,    31,   157,    46,    47,   107,   108,    28,    29,
-       4,   146,   122,   122,   101,   102,   103,   104,   105,   106,
-     130,   130,    30,    29,    47,   160,    32,     5,   109,   110,
-     111,    36,    37,    47,   144,     5,    27,    27,    27,    31,
-      14,    28,    15,    31,    47,    31,    31,   157,   157,    32,
-      27,    32,    28,    32,    17,    27,     4,    32,    27,    20,
-     151,    68,    89,    34,    31,    84,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,   154,    -1,    -1,    -1,    -1,    -1,
+       6,    40,    51,    51,    10,    29,    83,     6,    32,     3,
+      97,    47,    18,   110,     5,    21,     5,    19,    20,    96,
+     117,   118,    13,   100,    13,    16,    32,    16,    27,    10,
+      11,    22,    23,    22,    23,    41,    26,    43,    44,     0,
+      18,    31,    18,    45,    29,   132,    95,    32,    97,    97,
+      99,    99,    31,   140,   131,    46,    47,    27,    47,    37,
+      38,    39,    40,    41,    42,    43,    44,    43,    44,    29,
+      29,     8,    32,    32,    24,    25,   119,   120,   121,   156,
+     167,    31,    47,   132,   132,   111,   112,   113,   114,   115,
+     116,   140,   140,   170,    28,    29,    46,    47,   137,    28,
+      29,    47,    48,    30,    37,   154,     4,    27,    47,     5,
+       5,    27,    27,    27,    31,    28,    47,    14,   167,   167,
+      31,    31,    31,    27,    32,    28,    32,    32,    15,    17,
+       4,    32,    21,    27,    27,    78,   161,    99,    30,    94,
+     179,    -1,    42,    45,    -1,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,   164,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-     170
+      -1,    -1,    -1,    -1,   180
   };
 
   const signed char
   Parser::yystos_[] =
   {
-       0,    50,    51,     0,     3,    47,    31,    47,    62,    63,
-      29,    32,    62,    27,    52,    53,    54,    30,     4,    57,
-      58,    59,    60,    55,    59,    61,    62,    64,    65,    28,
-      29,    56,    10,    11,    66,    67,    68,    70,    47,   107,
-      62,     5,    79,    62,    62,    67,    53,    53,    27,    13,
-      16,    22,    23,    46,    47,    79,    80,    81,    82,    85,
-      86,    87,    88,    91,    92,    93,    97,    69,    71,    27,
-      27,    24,    25,    31,    46,    88,    90,    91,   100,   102,
-     103,   104,   105,   106,    98,    31,    31,    28,     6,    27,
-      26,    31,    14,    95,    31,    72,    72,   102,    31,    94,
+       0,    50,    51,     0,     3,    47,    31,    47,    66,    67,
+      29,    32,    66,    27,    52,    53,    54,    30,     8,    58,
+      59,    60,    66,    55,    60,    37,     4,    61,    66,   111,
+      62,    63,    64,    56,    27,    63,    65,    66,    68,    69,
+      28,    29,    57,    10,    11,    70,    71,    72,    74,   111,
+      66,     5,    83,    66,    66,    71,    53,    53,    27,    13,
+      16,    22,    23,    46,    47,    83,    84,    85,    86,    89,
+      90,    91,    92,    95,    96,    97,   101,    73,    75,    27,
+      27,    24,    25,    31,    46,    92,    94,    95,   104,   106,
+     107,   108,   109,   110,   102,    31,    31,    28,     6,    27,
+      26,    31,    14,    99,    31,    76,    76,   106,    31,    98,
       18,    37,    38,    39,    40,    41,    42,    43,    44,    19,
-      20,    45,   100,    84,    91,    83,   102,    82,    81,   102,
-      32,    89,    96,    74,    75,    76,    27,    28,    32,    32,
-      15,   104,   103,   103,   103,   103,   103,   103,   104,   104,
-     105,   105,   105,    17,    29,    32,    29,    32,   101,   102,
-      82,    27,    73,     4,    78,   107,    82,    99,    91,   102,
-      29,    32,    75,    32,    62,    77,    27,    82,   102,    28,
-      29,   107,    62
+      20,    45,   104,    88,    95,    87,   106,    86,    85,   106,
+      32,    93,   100,    78,    79,    80,    27,    28,    32,    32,
+      15,   108,   107,   107,   107,   107,   107,   107,   108,   108,
+     109,   109,   109,    17,    29,    32,    29,    32,   105,   106,
+      86,    27,    77,     4,    82,   111,    86,   103,    95,   106,
+      29,    32,    79,    32,    66,    81,    27,    86,   106,    28,
+      29,   111,    66
   };
 
   const signed char
   Parser::yyr1_[] =
   {
-       0,    49,    51,    52,    50,    54,    55,    56,    53,    57,
-      57,    58,    58,    60,    59,    61,    61,    62,    63,    63,
-      65,    64,    64,    66,    66,    67,    67,    69,    68,    71,
-      70,    73,    72,    72,    74,    74,    76,    75,    77,    77,
-      78,    78,    79,    80,    80,    81,    81,    81,    82,    82,
-      82,    82,    82,    82,    82,    83,    83,    84,    84,    85,
-      86,    86,    87,    87,    89,    88,    90,    91,    92,    94,
-      93,    96,    95,    95,    98,    99,    97,   100,   101,   101,
-     102,   102,   102,   102,   102,   102,   102,   103,   103,   103,
-     103,   104,   104,   104,   104,   105,   105,   105,   105,   105,
-     106,   106,   106,   107
+       0,    49,    51,    52,    50,    54,    55,    56,    57,    53,
+      58,    58,    59,    59,    60,    61,    61,    62,    62,    64,
+      63,    65,    65,    66,    67,    67,    69,    68,    68,    70,
+      70,    71,    71,    73,    72,    75,    74,    77,    76,    76,
+      78,    78,    80,    79,    81,    81,    82,    82,    83,    84,
+      84,    85,    85,    85,    86,    86,    86,    86,    86,    86,
+      86,    87,    87,    88,    88,    89,    90,    90,    91,    91,
+      93,    92,    94,    95,    96,    98,    97,   100,    99,    99,
+     102,   103,   101,   104,   105,   105,   106,   106,   106,   106,
+     106,   106,   106,   107,   107,   107,   107,   108,   108,   108,
+     108,   109,   109,   109,   109,   109,   110,   110,   110,   111
   };
 
   const signed char
   Parser::yyr2_[] =
   {
-       0,     2,     0,     0,    10,     0,     0,     0,     6,     2,
-       0,     2,     1,     0,     5,     3,     1,     1,     3,     1,
-       0,     2,     0,     2,     1,     3,     3,     0,     5,     0,
-       7,     0,     4,     0,     3,     1,     0,     5,     3,     1,
-       1,     0,     3,     3,     1,     3,     1,     0,     1,     1,
-       1,     1,     1,     4,     4,     3,     1,     3,     1,     3,
-       1,     1,     1,     3,     0,     5,     3,     1,     2,     0,
-       5,     0,     3,     0,     0,     0,     6,     1,     3,     1,
-       3,     3,     3,     3,     3,     3,     1,     3,     3,     3,
-       1,     3,     3,     3,     1,     1,     1,     1,     3,     1,
-       1,     1,     1,     1
+       0,     2,     0,     0,    10,     0,     0,     0,     0,     8,
+       2,     0,     2,     1,     4,     2,     0,     2,     1,     0,
+       5,     3,     1,     1,     3,     1,     0,     2,     0,     2,
+       1,     3,     3,     0,     5,     0,     7,     0,     4,     0,
+       3,     1,     0,     5,     3,     1,     1,     0,     3,     3,
+       1,     3,     1,     0,     1,     1,     1,     1,     1,     4,
+       4,     3,     1,     3,     1,     3,     1,     1,     1,     3,
+       0,     5,     3,     1,     2,     0,     5,     0,     3,     0,
+       0,     0,     6,     1,     3,     1,     3,     3,     3,     3,
+       3,     3,     1,     3,     3,     3,     1,     3,     3,     3,
+       1,     1,     1,     1,     3,     1,     1,     1,     1,     1
   };
 
 
@@ -2038,18 +2080,19 @@ namespace bison {
   "DIFERENTE", "MENOR_QUE", "MENOR_OU_IGUAL", "MAIOR_OU_IGUAL",
   "MAIOR_QUE", "MAIS", "MENOS", "MULTI", "NUMERO", "IDENT",
   "LOWER_THAN_ELSE", "$accept", "programa", "$@1", "@2", "bloco", "@3",
-  "@4", "$@5", "parte_declara_vars", "declara_vars", "declara_var", "$@6",
-  "lista_var", "ident", "lista_idents", "parte_declara_subrotinas_wrap",
-  "$@7", "parte_declara_subrotinas", "parte_declara_subrotinas_two",
-  "declaracao_procedimento", "@8", "declaracao_funcao", "@9",
-  "declaracao_params", "$@10", "parametros_formais",
-  "secao_parametros_formais", "$@11", "lista_params", "tipo_parametro",
+  "$@4", "@5", "$@6", "parte_declara_tipo", "define_tipos", "define_tipo",
+  "parte_declara_vars", "declara_vars", "declara_var", "$@7", "lista_var",
+  "ident", "lista_idents", "parte_declara_subrotinas_wrap", "$@8",
+  "parte_declara_subrotinas", "parte_declara_subrotinas_two",
+  "declaracao_procedimento", "@9", "declaracao_funcao", "@10",
+  "declaracao_params", "$@11", "parametros_formais",
+  "secao_parametros_formais", "$@12", "lista_params", "tipo_parametro",
   "comando_composto", "lista_comandos", "comando", "comando_sem_rotulo",
   "lista_write", "lista_read", "atribuicao", "chamada_procedimento",
-  "chamada_sem_pametro", "chamada_procedimento_parametros", "$@12",
+  "chamada_sem_pametro", "chamada_procedimento_parametros", "$@13",
   "chamada_funcao_sem_parametros", "variavel", "comando_condicional",
-  "if_then", "$@13", "cond_else", "$@14", "comando_repetitivo", "$@15",
-  "$@16", "expressao_booleana", "lista_de_expressoes", "expressao",
+  "if_then", "$@14", "cond_else", "$@15", "comando_repetitivo", "$@16",
+  "$@17", "expressao_booleana", "lista_de_expressoes", "expressao",
   "expressao_simples", "termo", "fator", "variavel_func", "tipo", YY_NULLPTR
   };
 #endif
@@ -2059,17 +2102,17 @@ namespace bison {
   const short
   Parser::yyrline_[] =
   {
-       0,    83,    83,    89,    83,   102,   116,   122,   102,   147,
-     153,   161,   162,   166,   166,   177,   184,   194,   202,   209,
-     220,   220,   231,   235,   236,   240,   244,   254,   253,   274,
-     273,   296,   295,   302,   310,   311,   316,   316,   334,   340,
-     349,   353,   361,   365,   366,   371,   372,   373,   378,   379,
-     380,   381,   382,   383,   384,   388,   392,   399,   404,   414,
-     431,   443,   451,   455,   463,   462,   500,   515,   524,   529,
-     528,   537,   536,   544,   553,   557,   552,   567,   576,   583,
-     594,   598,   602,   606,   610,   614,   618,   623,   627,   631,
-     635,   640,   644,   648,   652,   657,   662,   667,   672,   676,
-     681,   701,   709,   720
+       0,    85,    85,    91,    85,   104,   118,   122,   128,   104,
+     152,   157,   164,   165,   169,   178,   184,   192,   193,   197,
+     197,   208,   215,   225,   233,   240,   251,   251,   262,   266,
+     267,   271,   275,   285,   284,   306,   305,   328,   327,   334,
+     342,   343,   348,   348,   366,   372,   381,   385,   393,   397,
+     398,   403,   404,   405,   410,   411,   412,   413,   414,   415,
+     416,   420,   424,   431,   436,   446,   462,   474,   482,   486,
+     494,   493,   531,   546,   555,   560,   559,   568,   567,   575,
+     584,   588,   583,   598,   607,   614,   625,   629,   633,   637,
+     641,   645,   649,   654,   658,   662,   666,   671,   675,   679,
+     683,   688,   693,   698,   703,   707,   712,   732,   740,   751
   };
 
   void
@@ -2151,11 +2194,11 @@ namespace bison {
       return symbol_kind::S_YYUNDEF;
   }
 
-#line 29 "src/bison.y"
+#line 30 "src/bison.y"
 } // bison
-#line 2157 "bison.cpp"
+#line 2200 "bison.cpp"
 
-#line 733 "src/bison.y"
+#line 757 "src/bison.y"
 
 
 void bison::Parser::error(const std::string& msg) {

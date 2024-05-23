@@ -13,6 +13,7 @@ int lexic_level = 0;
 int num_total_vars = 0;
 int num_total_params = 0;
 int num_same_type_vars = 0;
+int num_type_declared = 0;
 int top_desloc = 0;
 
 std::list<Param> *params;
@@ -57,9 +58,10 @@ std::stack<std::stack<Param>> calling_proc_params = {};
 %type <std::string> ident
 
 %type <int> parte_declara_vars
+%type <int> parte_declara_tipo
 
 %type <tipo_parametro> tipo_parametro
-%type <tipo_variavel> tipo
+%type <Tipo*> tipo
 
 %token PROGRAM VAR T_BEGIN T_END
 %token LABEL TYPE ARRAY PROCEDURE
@@ -112,10 +114,13 @@ bloco:
       top_desloc = 0;
       $<Simbolo*>$ = proce;
    }
-   parte_declara_tipo
+   parte_declara_tipo 
+   {
+      $1->number_types = $2;
+   }
    parte_declara_vars
    <Simbolo*>{
-      $1->number_vars = $2;
+      $1->number_vars = $4;
 
       $$ = $1;
    }
@@ -131,9 +136,9 @@ bloco:
       if(!proce->is_main())
          removeSimbolos(proce->parametros->size() + proce->number_vars);
 
+      removeTipos($1->number_types);
       geraCodigo("DMEM", proce->number_vars);
-
-      visualizaTabela();
+      visualizaTabelas();
 
       if (proce->is_proc_or_func())
          geraCodigo("RTPR", proce->nivel_lexico, proce->parametros->size());
@@ -145,7 +150,14 @@ bloco:
 
 parte_declara_tipo:
    TYPE define_tipos
-   | %empty
+   {
+      $$ = num_type_declared;
+      visualizaTabelaTipos();
+   }
+   | %empty 
+   {
+      $$ = 0;
+   }
 ;
 
 define_tipos:
@@ -155,6 +167,10 @@ define_tipos:
 
 define_tipo:
    ident IGUAL tipo PONTO_E_VIRGULA
+   {
+      insereTipo($1, $3);
+      num_type_declared++;
+   }
 ;
 
 // 8. Parte de Declaracoes de variaveis
@@ -163,7 +179,7 @@ parte_declara_vars:
    {
       geraCodigo("AMEM", num_total_vars);
       $$ = num_total_vars;
-      visualizaTabela();
+      visualizaTabelaSimbolos();
    }
    | %empty
    {
@@ -183,7 +199,7 @@ declara_var:
    }
    lista_var DOIS_PONTOS tipo PONTO_E_VIRGULA
    {
-      colocaTipoEmSimbolos($<tipo_variavel>4, num_same_type_vars);
+      colocaTipoEmSimbolos($4, num_same_type_vars);
       num_same_type_vars = 0;
    }
 ;
@@ -270,6 +286,7 @@ declaracao_procedimento:
       lexic_level++;
       num_total_vars = 0;
       num_total_params = 0;
+      num_type_declared = 0;
       
       params = new std::list<Param>();
       Simbolo *proce = new Simbolo($2, lexic_level, params, process);
@@ -333,8 +350,8 @@ secao_parametros_formais:
    }
    tipo_parametro lista_params DOIS_PONTOS tipo
    {
-      tipo_variavel tipo_v = $<tipo_variavel>5;
-      tipo_parametro tipo_param = $<tipo_parametro>2;
+      Tipo *tipo_v = $5;
+      tipo_parametro tipo_param = $2;
 
       for(int i = 0;i < num_same_type_vars;i++) {
          params->push_back(Param(tipo_v, tipo_param));
@@ -430,14 +447,13 @@ atribuicao:
    ATRIBUICAO
    expressao
    {
-      if($1->is_func())
-         if(!$1->allow_return)
-            error("Função não pode ser usada como variável");
-      
-      if($1->tipo_v == $3.tipo_v)
-         aplicarArmazena($1);
-      else
+      if($1->allow_return)
+         error("Função não pode ser usada como variável");
+
+      if(*($1->tipo_v) != *($3.tipo_v))
          error("Tipos incompatíveis na atribuição");
+      
+      aplicarArmazena($1);
    }
 ;
 
@@ -581,7 +597,7 @@ comando_repetitivo:
 expressao_booleana:
    expressao
    {
-      if($1.tipo_v != t_bool)
+      if($1.tipo_v->primitive_type != t_bool)
          error("Expressão booleana inválida");
    }
 ;
@@ -672,17 +688,17 @@ fator:
    NUMERO 
    {
       geraCodigo("CRCT", "", simbolo_flex);
-      $$ = Param(t_int, t_copy);
+      $$ = Param(buscaTipoPrimitivo(t_int), t_copy);
    }
    | TRUE 
    {
       geraCodigo("CRCT", 1);
-      $$ = Param(t_bool, t_copy);
+      $$ = Param(buscaTipoPrimitivo(t_bool), t_copy);
    }
    | FALSE 
    {
       geraCodigo("CRCT", 0);
-      $$ = Param(t_bool, t_copy);
+      $$ = Param(buscaTipoPrimitivo(t_bool), t_copy);
    }
    | ABRE_PARENTESES expressao FECHA_PARENTESES
    {
@@ -732,16 +748,9 @@ variavel_func:
 ;
 
 tipo:
-   IDENT
+   ident
    {
-      if (simbolo_flex == "boolean")
-         $$ = t_bool;
-      else if (simbolo_flex == "integer")
-         $$ = t_int;
-      else {
-         $$ = t_undefined;
-         error("Tipo inválido");
-      }
+      $$ = buscaTipo($1);
    }
 ;
 

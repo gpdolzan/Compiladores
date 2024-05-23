@@ -2,6 +2,8 @@
 #include "../includes/utils/simbolos.hpp"
 #include "../includes/utils/tabela_rotulos.hpp"
 #include "../includes/utils/tabela_simbolos.hpp"
+#include "../includes/utils/tabela_tipos.hpp"
+#include "../includes/utils/tipo.hpp"
 
 #include <iostream>
 #include <string>
@@ -14,61 +16,72 @@ int nl = 1, instruction_count = 0;
 // Compiler variables
 TabelaSimbolos *tabela_simb;
 TabelaRotulos *tabela_rotulos;
-std::ofstream mepa_stream;
+TabelaTipos *tabela_tipos;
+
+std::ofstream compiled_stream;
 
 void geraCodigo(const std::string &comando, int arg1) {
-  mepa_stream << "     " << comando << " " << arg1 << std::endl;
+  compiled_stream << "     " << comando << " " << arg1 << std::endl;
 
   instruction_count++;
-  mepa_stream.flush();
+  compiled_stream.flush();
 }
 
 void geraCodigo(const std::string &comando, int arg1, int arg2) {
-  mepa_stream << "     " << comando << " " << arg1 << ", " << arg2 << std::endl;
+  compiled_stream << "     " << comando << " " << arg1 << ", " << arg2
+                  << std::endl;
 
   instruction_count++;
-  mepa_stream.flush();
+  compiled_stream.flush();
 }
 
 void geraCodigo(const std::string &comando, const std::string &rot,
                 const std::string &arg1, const std::string &arg2) {
   if (rot != "")
-    mepa_stream << rot << ": ";
+    compiled_stream << rot << ": ";
   else
-    mepa_stream << "     ";
+    compiled_stream << "     ";
 
   if (arg1 == "")
-    mepa_stream << comando;
+    compiled_stream << comando;
   else {
     if (arg2 == "")
-      mepa_stream << comando << " " << arg1;
+      compiled_stream << comando << " " << arg1;
     else
-      mepa_stream << comando << " " << arg1 << ", " << arg2;
+      compiled_stream << comando << " " << arg1 << ", " << arg2;
   }
-  mepa_stream << std::endl;
+  compiled_stream << std::endl;
 
   instruction_count++;
 
-  mepa_stream.flush();
+  compiled_stream.flush();
+}
+
+void insereTiposSimples(TabelaTipos *tabela) {
+  tabela->push(new Tipo("integer", t_int));
+  tabela->push(new Tipo("boolean", t_bool));
 }
 
 void iniciaCompilador() {
-  mepa_stream.open("mepa.txt", std::ofstream::out);
-
   tabela_simb = new TabelaSimbolos;
   tabela_rotulos = new TabelaRotulos;
+  tabela_tipos = new TabelaTipos;
+  insereTiposSimples(tabela_tipos);
+
+  tabela_tipos->print_tabela();
 }
 
 void desligaCompilador() {
-  mepa_stream.close();
+  compiled_stream.close();
 
-  // delete tabela_simb;
+  delete tabela_simb;
   delete tabela_rotulos;
+  delete tabela_tipos;
 }
 
 Param aplicarOperacao(const std::string &op, Param var1, Param var2) {
-  tipo_variavel result_type;
-  tipo_variavel needed_type;
+  tipo_simples_variavel result_type;
+  tipo_simples_variavel needed_type;
 
   if (op == "CMME") {
     result_type = t_bool;
@@ -110,8 +123,13 @@ Param aplicarOperacao(const std::string &op, Param var1, Param var2) {
     error("Operação desconhecida");
   }
 
-  if ((var1.tipo_v != var2.tipo_v) || (var1.tipo_v != needed_type))
-    error("type mismatch");
+  Tipo *tipo1 = var1.tipo_v;
+  Tipo *tipo2 = var2.tipo_v;
+
+  if (tipo1->primitive_type != needed_type)
+    error("Tipos diferentes");
+  if (tipo1->primitive_type != needed_type)
+    error("Tipos incompatíveis com a operação");
 
   geraCodigo(op);
 
@@ -119,7 +137,9 @@ Param aplicarOperacao(const std::string &op, Param var1, Param var2) {
   if (var1.tipo_param == t_pointer || var2.tipo_param == t_pointer)
     tipo_param = t_pointer;
 
-  return Param(result_type, tipo_param);
+  Tipo *tipo_resultante = tabela_tipos->busca_tipo_primitivo(result_type);
+
+  return Param(tipo_resultante, tipo_param);
 }
 
 void insereSimbolo(Simbolo *simb) { tabela_simb->push(simb); }
@@ -148,7 +168,7 @@ void removeSimbolos(int quant) {
   }
 }
 
-void colocaTipoEmSimbolos(tipo_variavel tipo, int quantidade) {
+void colocaTipoEmSimbolos(Tipo *tipo, int quantidade) {
   tabela_simb->coloca_tipo_em_simbolos(tipo, quantidade);
 }
 
@@ -175,7 +195,13 @@ Rotulo *buscaRotulo(int top_offset) {
   return tabela_rotulos->busca_rotulo(top_offset);
 }
 
-void visualizaTabela() { tabela_simb->print_tabela(); }
+void visualizaTabelas() {
+  tabela_simb->print_tabela();
+  tabela_tipos->print_tabela();
+}
+
+void visualizaTabelaSimbolos() { tabela_simb->print_tabela(); }
+void visualizaTabelaTipos() { tabela_tipos->print_tabela(); }
 
 void start_while() {
   Rotulo *start_rot = new Rotulo();
@@ -290,4 +316,32 @@ void aplicarCarrega(Simbolo *simb, const Param &param) {
   }
 
   geraCodigo(comando, simb->nivel_lexico, simb->deslocamento);
+}
+
+void insereTipo(std::string identificador, Tipo *tipo_pai) {
+  tabela_tipos->push(new Tipo(identificador, tipo_pai));
+}
+
+Tipo *buscaTipo(std::string identificador) {
+  Tipo *tipo = tabela_tipos->busca_tipo(identificador);
+
+  if (tipo == nullptr)
+    error("Tipo não declarado: " + identificador);
+
+  return tipo;
+}
+
+Tipo *buscaTipoPrimitivo(tipo_simples_variavel tipo_primitivo) {
+  Tipo *tipo = tabela_tipos->busca_tipo_primitivo(tipo_primitivo);
+
+  if (tipo == nullptr)
+    error("Tipo primitivo não declarado");
+
+  return tipo;
+}
+
+void removeTipos(int quantidade) {
+  for (int i = 0; i < quantidade; i++) {
+    tabela_tipos->pop();
+  }
 }

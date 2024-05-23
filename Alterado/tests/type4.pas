@@ -4,6 +4,23 @@ type banana  = integer;
 var b : banana;
    l  :  laranja;
    x  : integer;
+   procedure sorveteria;
+   type sundei = banana;
+      sorvetinho = integer;
+   var ba: banana;
+      la: laranja;
+   begin
+      
+   end;
+   
+   procedure fechoaria;
+   type feijaoPreto = boolean;
+      feijaoCarioca = boolean;
+   var ba: sorvetinho;
+      la: laranja;
+   begin
+      
+   end;
 begin
    x := 10;
    l := x;
