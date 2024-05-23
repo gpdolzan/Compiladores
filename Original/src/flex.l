@@ -312,11 +312,25 @@ false {
 
 %%
 
-int main() {
-    yyscan_t scanner;
-    yylex_init(&scanner);
-    bison::Parser parser{ scanner };
-    std::cout.precision(10);
-    parser.parse();
-    yylex_destroy(scanner);
+int main(int argc, char* argv[]) {  
+  yyscan_t scanner;
+  FILE *inputFile;
+
+  if (argc<2 || argc>2) {
+    printf("usage compilador <arq>a %d\n", argc);
+    return(-1);
+  }
+
+  inputFile = fopen(argv[1], "r");
+  if (inputFile == NULL) {
+    printf("usage compilador <arq>b\n");
+    return(-1);
+  }
+
+  yylex_init(&scanner);
+  yyset_in(inputFile, scanner);
+  bison::Parser parser{ scanner };
+  std::cout.precision(10);
+  parser.parse();
+  yylex_destroy(scanner);
 }
